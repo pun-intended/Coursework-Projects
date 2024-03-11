@@ -7,12 +7,13 @@ const {
   ensureLoggedIn,
   ensureAdmin,
   ensureCorrectUserOrAdmin,
+  ensureMaster,
 } = require("./auth");
 
 
 const { SECRET_KEY } = require("../config");
-const testJwt = jwt.sign({ id: 10001, is_admin: false }, SECRET_KEY);
-const badJwt = jwt.sign({ id: 10001, is_admin: false }, "wrong");
+const testJwt = jwt.sign({ id: 10001, role: 'user' }, SECRET_KEY);
+const badJwt = jwt.sign({ id: 10001, role: 'user' }, "wrong");
 
 
 describe("authenticateJWT", function () {
@@ -30,7 +31,7 @@ describe("authenticateJWT", function () {
       user: {
         iat: expect.any(Number),
         id: 10001,
-        is_admin: false,
+        role: 'user',
       },
     });
   });
@@ -63,7 +64,7 @@ describe("ensureLoggedIn", function () {
   test("works", function () {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { id: 10001, is_admin: false } } };
+    const res = { locals: { user: { id: 10001, role: 'user' } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
@@ -82,25 +83,35 @@ describe("ensureLoggedIn", function () {
 });
 
 
-describe("ensureAdmin", function () {
+describe("ensureSchoolAdmin", function () {
   test("works", function () {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { id: 10001, is_admin: true } } };
+    const res = { locals: { user: { id: 10001, role: 'school' } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
-    ensureAdmin(req, res, next);
+    ensureSchoolAdmin(req, res, next);
+  });
+  
+  test("works ith master role", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: { user: { id: 10001, role: 'master' } } };
+    const next = function (err) {
+      expect(err).toBeFalsy();
+    };
+    ensureSchoolAdmin(req, res, next);
   });
 
   test("unauth if not admin", function () {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { id: 10001, is_admin: false } } };
+    const res = { locals: { user: { id: 10001, role: 'user' } } };
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };
-    ensureAdmin(req, res, next);
+    ensureSchoolAdmin(req, res, next);
   });
 
   test("unauth if anon", function () {
@@ -110,7 +121,49 @@ describe("ensureAdmin", function () {
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };
-    ensureAdmin(req, res, next);
+    ensureSchoolAdmin(req, res, next);
+  });
+});
+
+describe("ensureMaster", function () {
+  test("works", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: { user: { id: 10001, role: 'school' } } };
+    const next = function (err) {
+      expect(err).toBeFalsy();
+    };
+    ensureMaster(req, res, next);
+  });
+  
+  test("works ith master role", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: { user: { id: 10001, role: 'master' } } };
+    const next = function (err) {
+      expect(err).toBeFalsy();
+    };
+    ensureMaster(req, res, next);
+  });
+
+  test("unauth if not admin", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: { user: { id: 10001, role: 'user' } } };
+    const next = function (err) {
+      expect(err instanceof UnauthorizedError).toBeTruthy();
+    };
+    ensureMaster(req, res, next);
+  });
+
+  test("unauth if anon", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: {} };
+    const next = function (err) {
+      expect(err instanceof UnauthorizedError).toBeTruthy();
+    };
+    ensureMaster(req, res, next);
   });
 });
 
