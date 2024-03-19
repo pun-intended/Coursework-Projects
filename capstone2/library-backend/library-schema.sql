@@ -19,7 +19,8 @@ CREATE TABLE users (
     school_id INTEGER
         REFERENCES schools ON DELETE SET NULL,
     password TEXT NOT NULL,
-    is_admin BOOLEAN NOT NULL DEFAULT FALSE
+    role string NOT NULL DEFAULT "user",
+        CHECK (role IN ("user", "school_admin", "master"))
 );
 
 CREATE TABLE students (

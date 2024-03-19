@@ -1,9 +1,11 @@
-INSERT INTO users (id, first_name, last_name, password, is_admin) 
+INSERT INTO users (id, first_name, last_name, password, role) 
 VALUES 
-    ('10001', 'test', 'user', 
-    '$2a$12$OnF1/U4/4QB4ccWdS5R4b.RLfGptno1kP4rGt8pPdAN24p8TULRnS', FALSE),
-    ('10002', 'test', 'user2', 
-    '$2a$12$OnF1/U4/4QB4ccWdS5R4b.RLfGptno1kP4rGt8pPdAN24p8TULRnS', TRUE);
+    ('10001', 'user', 'name', 
+    '$2a$12$OnF1/U4/4QB4ccWdS5R4b.RLfGptno1kP4rGt8pPdAN24p8TULRnS', 'user'),
+    ('10002', 'school', 'name', 
+    '$2a$12$OnF1/U4/4QB4ccWdS5R4b.RLfGptno1kP4rGt8pPdAN24p8TULRnS', 'school');
+    ('10003', 'master', 'user', 
+    '$2a$12$OnF1/U4/4QB4ccWdS5R4b.RLfGptno1kP4rGt8pPdAN24p8TULRnS', 'master');
 
 INSERT INTO students (id, first_name, last_name, level)
 VALUES 
