@@ -123,6 +123,28 @@ function App() {
 export default App;
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+// TODO - Functional - DB changes
+/**
+ * - add admin levels
+ * - Change db - book set (title, isbn, stage), school set (book id/isbn, school, set) referencing books
+ */
+
+// TODO - Function - Add admin levels - School, company
+/**
+ * School admin 
+ * - change roster
+ * - change books in set
+ * - add set of books
+ * - set teacher class
+ * 
+ * 
+ * Company admin
+ * - Add teachers
+ * - Change teacher school
+ */
+>>>>>>> Stashed changes
 // TODO - Fix CSS
 =======
 // TODO - Functional - DB changes

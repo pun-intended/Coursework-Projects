@@ -4,7 +4,7 @@ const { SECRET_KEY } = require("../config");
 
 describe("createToken", function () {
   test("works: not admin", function () {
-    const token = createToken({ id: 1, is_admin: false });
+    const token = createToken({ id: 1, role: 'user' });
     const payload = jwt.verify(token, SECRET_KEY);
     expect(payload).toEqual({
       iat: expect.any(Number),
@@ -14,7 +14,7 @@ describe("createToken", function () {
   });
 
   test("works: admin", function () {
-    const token = createToken({ id: 1, is_admin: true });
+    const token = createToken({ id: 1, role: 'master' });
     const payload = jwt.verify(token, SECRET_KEY);
     expect(payload).toEqual({
       iat: expect.any(Number),
