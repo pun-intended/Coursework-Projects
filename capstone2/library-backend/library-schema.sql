@@ -44,6 +44,12 @@ CREATE TABLE books (
     condition VARCHAR(10) NOT NULL
 );
 
+CREATE TABLE book_sets (
+    set_id SERIAL PRIMARY KEY,
+    school_id INTEGER REFERENCES schools,
+
+)
+
 -- // TODO - fix dateTime formatting
 CREATE TABLE borrow_record (
     id SERIAL PRIMARY KEY, 
@@ -55,6 +61,4 @@ CREATE TABLE borrow_record (
         -- TRIGGER? MasterBooks table? Normalization could complicate function calls
     borrow_date VARCHAR(12) NOT NULL,
     return_date VARCHAR(12)
-    -- returned_by INTEGER 
-        -- REFERENCES users ON DELETE SET NULL
 );

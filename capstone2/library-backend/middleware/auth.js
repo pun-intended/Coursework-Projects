@@ -43,14 +43,33 @@ function ensureLoggedIn(req, res, next) {
 }
 
 
-/** Middleware to use when they be logged in as an admin user.
+/** Middleware to use when they be logged in as an 'school' or 'master' admin.
  *
  *  If not, raises Unauthorized.
  */
 
-function ensureAdmin(req, res, next) {
+function ensureSchoolAdmin(req, res, next) {
   try {
-    if (!res.locals.user || !res.locals.user.is_admin) {
+    const user = res.locals.user;
+    const isAdmin = (user.role === 'master' || user.role === 'school')
+
+    if (!user || !isAdmin) {
+      throw new UnauthorizedError();
+    }
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+/** Middleware to use when they be logged in as an 'master' admin.
+ *
+ *  If not, raises Unauthorized.
+ */
+
+function ensureMaster(req, res, next) {
+  try {
+    if (!res.locals.user || !res.locals.user.role === 'master') {
       throw new UnauthorizedError();
     }
     return next();
@@ -68,7 +87,8 @@ function ensureAdmin(req, res, next) {
 function ensureCorrectUserOrAdmin(req, res, next) {
   try {
     const user = res.locals.user;
-    if (!(user && (user.is_admin || user.id == req.params.id))) {
+    const isAdmin = (user.role === 'master' || user.role === 'school')
+    if (!(user && (isAdmin || user.id == req.params.id))) {
       throw new UnauthorizedError();
     }
     return next();
@@ -81,6 +101,7 @@ function ensureCorrectUserOrAdmin(req, res, next) {
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
-  ensureAdmin,
+  ensureMaster,
+  ensureSchoolAdmin,
   ensureCorrectUserOrAdmin,
 };
