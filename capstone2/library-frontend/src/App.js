@@ -122,9 +122,7 @@ function App() {
 
 export default App;
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
+
 // TODO - Functional - DB changes
 /**
  * - add admin levels
@@ -144,9 +142,7 @@ export default App;
  * - Add teachers
  * - Change teacher school
  */
->>>>>>> Stashed changes
 // TODO - Fix CSS
-=======
 // TODO - Functional - DB changes
 /**
  * - add admin levels
@@ -171,7 +167,6 @@ export default App;
 // TODO - cosmetic - add container for alerts so things dont shift on removal
 // TODO - cosmetic - Set default image for image not found
 // TODO - cosmetic - Fix CSS
->>>>>>> Stashed changes
 /**
  * remove image on mobile
  * shrink text to fit screen
