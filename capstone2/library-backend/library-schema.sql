@@ -28,33 +28,28 @@ CREATE TABLE students (
     id SERIAL PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
-    school_id INTEGER
-        FOREIGN KEY REFERENCES schools(id) ON DELETE SET NULL,
     class_id INTEGER
-        FOREIGN KEY REFERENCES classes(id) ON DELETE SET NULL,
-    level TEXT NOT NULL
+        FOREIGN KEY REFERENCES classes(id) ON DELETE SET NULL
 );
 
 CREATE TABLE master_books (
     isbn text PRIMARY KEY,
     title TEXT NOT NULL,
     stage INTEGER NOT NULL,
-)
+);
 
 CREATE TABLE book_sets (
     set_id SERIAL PRIMARY KEY,
     school_id INTEGER 
         FOREIGN KEY REFERENCES schools(id) ON DELETE SET NULL,
-)
+);
 
 CREATE TABLE books (
     id SERIAL PRIMARY KEY,
     isbn TEXT NOT NULL
         FOREIGN KEY REFERENCES master_books(isbn) ON DELETE CASCADE,
-    set INTEGER
+    book_set INTEGER
         FOREIGN KEY REFERENCES book_sets(set_id) ON DELETE SET 0,
-    school_id INTEGER
-        FOREIGN KEY REFERENCES schools(id) ON DELETE SET NULL,
     condition VARCHAR(10) NOT NULL
 );
 
