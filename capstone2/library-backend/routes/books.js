@@ -121,9 +121,9 @@ router.get("/:id", ensureLoggedIn, async function (req, res, next) {
 // TODO ---- STRETCH 
 
 /**
- * Add book
+ * Add book set
  * 
- * Auth: admin
+ * Auth: School
  */
 
 /**
