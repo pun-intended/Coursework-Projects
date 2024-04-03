@@ -9,7 +9,7 @@ import useLocalStorage from './useLocalStorage';
 import { jwtDecode } from 'jwt-decode';
 import StudentContext from './StudentContext.js';
 import AlertContext from './AlertContext.js';
-import {Alert, Container} from "reactstrap"
+import {Container} from "reactstrap"
 import { v4 as uuidv4} from "uuid";
 import DismissableAlert from './DismissableAlert.js';
 
@@ -122,54 +122,39 @@ function App() {
 
 export default App;
 
-
-// TODO - Functional - DB changes
-/**
- * - add admin levels
- * - Change db - book set (title, isbn, stage), school set (book id/isbn, school, set) referencing books
- */
-
 // TODO - Function - Add admin levels - School, company
 /**
+ * Add admin level selector
+ * update API sql calls
+ * 
+ * 
+ * 
  * School admin 
  * - change roster
- * - change books in set
- * - add set of books
  * - set teacher class
+ * - Change student school
+ * - change student class
+ * - Student page, new year page (all students in level - needs age field), new K1 page
  * 
  * 
  * Company admin
  * - Add teachers
  * - Change teacher school
+ * - change books in stage
  */
 // TODO - Fix CSS
-// TODO - Functional - DB changes
-/**
- * - add admin levels
- * - Change db - book set (title, isbn, stage), school set (book id/isbn, school, set) referencing books
- */
 // TODO - Function - add id to booklist
-// TODO - Function - Add admin levels - School, company
-/**
- * School admin 
- * - change roster
- * - change books in set
- * - add set of books
- * - set teacher class
- * 
- * 
- * Company admin
- * - Add teachers
- * - Change teacher school
- */
-
 // TODO - function - add qr code functionality
 // TODO - cosmetic - add container for alerts so things dont shift on removal
 // TODO - cosmetic - Set default image for image not found
-// TODO - cosmetic - Fix CSS
 /**
  * remove image on mobile
  * shrink text to fit screen
  * center align items
  * responsive size for inputs in login
+ * 
+ * After QR Scan func
+ * - add set of books
+ *    - Select stage
+ * - create new QR code set
  */

@@ -7,7 +7,11 @@ const db = require('../db')
 // ----- After completion
 class School {
 
-    // What methods does the school need?
+    // Add school
+
+    // Edit school details
+
+    // Delete school
 }
 
 module.exports = School;
