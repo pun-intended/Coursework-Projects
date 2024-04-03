@@ -64,7 +64,7 @@ VALUES
 	('60099208', 'Big Max and the Mystery of the Missing Giraffe', 2),
 	('60518952', 'Happy Haunting, Amelia Bedelia', 2),
 	('9780060544645', 'Amazing Snakes!', 2),
-	('60544554', 'Amazing Dolphins! ', 2),
+	('60544554', 'Amazing Dolphins!', 2),
 	('60838000', 'Bread and Jam for Frances', 2),
 	('64443191', 'Detective Dinosaur Undercover', 2),
 	('9780061255359', 'Pony Scouts: Pony Crazy', 2),
