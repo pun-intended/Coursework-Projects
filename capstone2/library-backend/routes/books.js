@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureLoggedIn } = require("../middleware/auth");
+const { ensureLoggedIn, ensureMaster, ensureSchoolAdmin } = require("../middleware/auth");
 const Book = require("../models/book");
 
 const checkInSchema = require("../schemas/checkIn.json");
@@ -125,6 +125,11 @@ router.get("/:id", ensureLoggedIn, async function (req, res, next) {
  * 
  * Auth: School
  */
+router.push("/new/:stage", ensureSchoolAdmin, async function(req, res, next) {
+    try{
+        
+    }
+})
 
 /**
  * Delete book
