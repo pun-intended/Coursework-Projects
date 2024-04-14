@@ -6,6 +6,7 @@ const db = require('../db')
 
 class Book {
     /**
+     * ---OK
      * Given a student ID and book ID, create a borrow record, and 
      * return the data.
      * 
@@ -47,6 +48,7 @@ class Book {
     }
 
     /**
+     * ---OK
      * Given a book ID, check the book in
      * 
      * {data} => {id, return_date}
@@ -76,16 +78,18 @@ class Book {
      * Get all book data given the ID
      * 
      * {book_id} => {book_id, isbn, title, stage, condition, student}
-     *  where student is {student_id, first_name, last_name, level, borrowDate}
+     *  where student is {student_id, first_name, last_name, class, borrowDate}
      */
+    // TODO - Test new SQL query
+    // TODO - Refactor query to put join after select
     static async getBook(bookId){
         const bookRes = await db.query(
             `SELECT B.id AS book_id,
                     B.isbn,
-                    B.title,
-                    B.stage,
+                    M.title,
+                    M.stage,
                     B.condition
-            FROM books B
+            FROM books B JOIN master_books M ON B.isbn = M.isbn
 
             WHERE id = $1`,
             [bookId]);
@@ -98,7 +102,7 @@ class Book {
             `SELECT S.id,
                     S.first_name,
                     S.last_name,
-                    S.level,
+                    S.class,
                     rec.borrow_date
             FROM borrow_record rec
             JOIN students S ON S.id = rec.student_id
@@ -124,15 +128,15 @@ class Book {
 // TODO - STRETCH - add stage filter
     static async getAllBooks(){
         const books = await db.query(
-            `SELECT id,
-                    isbn,
-                    title,
-                    stage,
-                    condition,
-                    id NOT IN (SELECT b.id FROM books b JOIN borrow_record rec
+            `SELECT B.id,
+                    B.isbn,
+                    M.title,
+                    M.stage,
+                    B.condition,
+                    B.id NOT IN (SELECT b.id FROM books b JOIN borrow_record rec
                             ON rec.book_id = b.id
                             WHERE rec.return_date IS NULL) AS available
-            FROM books`
+            FROM books JOIN ma `
         )
         return books.rows
     }
@@ -170,6 +174,10 @@ class Book {
     // ----- add after completion
     // static async newSet(){}
     // static async replace(){}
+    
+    /**
+     * Add a new set of books for a given stage
+     */
 
 }
 
