@@ -22,7 +22,7 @@ const router = new express.Router();
  * Auth: login
  */
 
-// TODO - STRETCH - add stage filter
+// TODO - add stage filter
 router.get("/", ensureLoggedIn, async function (req, res, next) {
     const books = await Book.getAllBooks();
 

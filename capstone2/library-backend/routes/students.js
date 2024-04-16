@@ -20,7 +20,7 @@ const router = new express.Router();
  * 
  * Auth: login
  */
-// TODO - STRETCH - Refine search to school/class
+// TODO - Refine search to school/class
 router.get("/", ensureLoggedIn, async function (req, res, next) {
     try{
         const students = await Student.getAllStudents();
