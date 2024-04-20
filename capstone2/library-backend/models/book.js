@@ -75,13 +75,12 @@ class Book {
     }
 
     /**
+     * ---OK
      * Get all book data given the ID
      * 
      * {book_id} => {book_id, isbn, title, stage, condition, student}
-     *  where student is {student_id, first_name, last_name, class, borrowDate}
+     *  where student is {student_id, first_name, last_name, class_id, borrowDate}
      */
-    // TODO - Test new SQL query
-    // TODO - Refactor query to put join after select
     static async getBook(bookId){
         const bookRes = await db.query(
             `SELECT B.id AS book_id,
@@ -102,11 +101,12 @@ class Book {
             `SELECT S.id,
                     S.first_name,
                     S.last_name,
-                    S.class,
+                    S.class_id,
                     rec.borrow_date
             FROM borrow_record rec
             JOIN students S ON S.id = rec.student_id
-            WHERE book_id = $1 AND return_date IS NULL`,
+            JOIN books B ON B.isbn = rec.book_isbn
+            WHERE B.id = $1 AND return_date IS NULL`,
             [bookId]
         )
 
@@ -120,23 +120,23 @@ class Book {
     }
 
     /**
-     * Get all books in library.
+     * ---OK
+     * Get all books in school library.
      * 
-     * Returns [{id, isbn, title, stage, condition, available}, ...] 
+     * Returns [{id, isbn, title, stage, available}, ...] 
      */
+    static async getAllBooks(school_id, stage){
 
-// TODO - STRETCH - add stage filter
-    static async getAllBooks(){
         const books = await db.query(
-            `SELECT B.id,
-                    B.isbn,
-                    M.title,
-                    M.stage,
-                    B.condition,
-                    B.id NOT IN (SELECT b.id FROM books b JOIN borrow_record rec
-                            ON rec.book_id = b.id
-                            WHERE rec.return_date IS NULL) AS available
-            FROM books JOIN ma `
+            `SELECT isbn,
+                    title,
+                    stage,
+                    isbn IN (SELECT B.isbn FROM books B
+                                    FULL JOIN borrow_record rec ON rec.book_isbn = B.isbn
+                                    JOIN book_sets set ON set.set_id = b.book_set
+                            WHERE (rec.return_date IS NOT NULL OR rec.borrow_date IS NULL) AND set.school_id = $1) AS available
+            FROM master_books`
+            [school_id]
         )
         return books.rows
     }
