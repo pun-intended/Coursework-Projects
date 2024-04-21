@@ -16,8 +16,6 @@ class Book {
      * Throws NotFoundError if student or book is not found
      */
     static async checkOut(data){
-        // QUESTION - is there a better way to do this? Insert throws 
-        //      foreign key error instead of returning nothing
 
         const checkBookExists = await db.query(
             `SELECT id FROM books WHERE id = $1`,
@@ -105,8 +103,8 @@ class Book {
                     rec.borrow_date
             FROM borrow_record rec
             JOIN students S ON S.id = rec.student_id
-            JOIN books B ON B.isbn = rec.book_isbn
-            WHERE B.id = $1 AND return_date IS NULL`,
+            JOIN books B ON B.id = rec.book_id
+            WHERE B.id = $1 AND rec.return_date IS NULL`,
             [bookId]
         )
 
@@ -132,8 +130,8 @@ class Book {
                     title,
                     stage,
                     isbn IN (SELECT B.isbn FROM books B
-                                    FULL JOIN borrow_record rec ON rec.book_isbn = B.isbn
-                                    JOIN book_sets set ON set.set_id = b.book_set
+                                    FULL JOIN borrow_record rec ON rec.book_id = B.id
+                                    JOIN book_sets set ON set.set_id = b.set_id
                             WHERE (rec.return_date IS NOT NULL OR rec.borrow_date IS NULL) AND set.school_id = $1) AS available
             FROM master_books`
             [school_id]
@@ -149,9 +147,9 @@ class Book {
     static async getOutstanding(){
         const books = await db.query(
             `SELECT B.id AS book_id,
-                    B.isbn,
-                    B.title,
-                    B.stage,
+                    M.isbn,
+                    M.title,
+                    M.stage,
                     B.condition,
                     S.id AS student_id,
                     S.first_name,
@@ -159,26 +157,14 @@ class Book {
                     rec.borrow_date
             FROM books B
             JOIN borrow_record AS rec ON B.id = rec.book_id
+            JOIN book_sets AS set ON set.set_id = B.set_id
+            JOIN master_books AS M on B.isbn = M.isbn
             JOIN students AS S on S.id = rec.student_id
-            WHERE rec.return_date IS NULL`
+            WHERE rec.return_date IS NULL AND set.school_id = 101`
         )
         return books.rows
 
     }
-
-    /**
-     * Get all books in a given stage
-     * {stage} => [{id, isbn, title, stage, condition}, ...]
-     */
-    static async getBooksByStage(stage){}
-    // ----- add after completion
-    // static async newSet(){}
-    // static async replace(){}
-    
-    /**
-     * Add a new set of books for a given stage
-     */
-
 }
 
 module.exports = Book;
