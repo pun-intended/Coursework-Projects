@@ -7,8 +7,7 @@ CREATE TABLE classes (
     id SERIAL PRIMARY KEY,
     name VARCHAR(20) NOT NULL,
     school_id INTEGER NOT NULL 
-        REFERENCES schools(id) ON DELETE CASCADE,
-    level VARCHAR(5) NOT NULL
+        REFERENCES schools(id) ON DELETE CASCADE
 );
 
 CREATE TABLE master_books (
@@ -48,7 +47,7 @@ CREATE TABLE books (
     id SERIAL PRIMARY KEY,
     isbn TEXT NOT NULL
         REFERENCES master_books(isbn) ON DELETE CASCADE,
-    book_set INTEGER
+    set_id INTEGER
         REFERENCES book_sets(set_id) ON DELETE SET NULL,
     condition VARCHAR(10) DEFAULT 'Great'
 );
@@ -58,8 +57,8 @@ CREATE TABLE borrow_record (
     id SERIAL PRIMARY KEY, 
     student_id INTEGER NOT NULL
         REFERENCES students(id) ON DELETE CASCADE, 
-    book_isbn TEXT NOT NULL
-        REFERENCES master_books(isbn) ON DELETE CASCADE,
+    book_id INTEGER NOT NULL
+        REFERENCES books(id) ON DELETE CASCADE,
     borrow_date VARCHAR(12) NOT NULL,
     return_date VARCHAR(12)
 );
