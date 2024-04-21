@@ -2,7 +2,6 @@
 const { NotFoundError } = require('../expressError.js')
 
 const db = require('../db')
-// TODO - fix dateTime formatting
 
 class Book {
     /**
@@ -163,7 +162,23 @@ class Book {
             WHERE rec.return_date IS NULL AND set.school_id = 101`
         )
         return books.rows
+    }
 
+    // Add individual book
+    static async addBook(isbn, set){
+
+    }
+
+    // Update book
+    static async updateBook(data){
+        // try to update data in book record
+        // allow changing of set_id, condition
+    }
+
+    // Delete individual book
+    static async deleteBook(book_id){
+        // find book
+        // Delete book if exists
     }
 }
 
