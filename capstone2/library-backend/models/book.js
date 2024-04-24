@@ -124,6 +124,7 @@ class Book {
      */
     static async getAllBooks(school_id, stage){
 
+        // Will the available field cause false positives when a book is taken out a second time? Limit IDs to null return dates?
         const books = await db.query(
             `SELECT isbn,
                     title,
@@ -165,20 +166,49 @@ class Book {
     }
 
     // Add individual book
-    static async addBook(isbn, set){
-
+    static async add(isbn, set){
+        const newBook = await db.query(
+            `INSERT INTO books (isbn, set_id)
+            VALUES ($1, $2)
+            RETURNING id`
+            [isbn, set]
+        )
+        return newBook.rows
     }
 
     // Update book
-    static async updateBook(data){
+    static async update(data, id){
         // try to update data in book record
-        // allow changing of set_id, condition
+        const { setCols, values } = sqlForPartialUpdate(
+            data, {});
+        const bookIdVarIdx = `$${values.length +1}`
+        const queryStr = `
+            UPDATE books
+            SET ${setCols}
+            WHERE id = ${bookIdVarIdx}
+            RETURNING id`;
+        const updateBook = await db.query(`${queryStr}`, [...values, id]);
+
+        const book = updateBook.rows[0];
+
+        return book;
+
     }
 
     // Delete individual book
-    static async deleteBook(book_id){
-        // find book
-        // Delete book if exists
+    static async remove(book_id){
+        
+        const book = await db.query(
+            `DELETE FROM books
+            WHERE id = $1
+            RETURNING id`,
+            [book_id]
+        )
+
+        const deleted = book.rows[0];
+        
+        if(!book) throw new NotFoundError(`No book found with ID: ${book_id}`)
+        return book
     }
 }
 

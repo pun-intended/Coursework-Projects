@@ -10,12 +10,16 @@ class Class {
     /**
      * Create new class with given name
      */
-    static async create(){}
-
-    /**
-     * populate class with array of given student IDs
-     */
-    static async populateClass(){}
+    static async create(className, schoolId){
+        const newClass = await db.query(
+            `INSERT INTO classes (name, school_id)
+            VALUES ($1, $2)
+            RETURNING name, school`,
+            [className, schoolId]
+        )
+        
+        return newClass.rows[0];
+    }
 
     /**
      * Remove class record

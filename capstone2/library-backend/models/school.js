@@ -8,7 +8,7 @@ const db = require('../db')
 class School {
 
     // Add school
-
+    
     // Edit school details
 
     // Delete school

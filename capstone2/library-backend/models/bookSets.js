@@ -9,7 +9,7 @@ class BookSet {
     static async createSet(school_id, stage){
         // if no stage, create whole set
         // check if last school set contains stage
-        // create stage in last set if not, create new set if has 
+        // create stage in last set if not, create new set if has
     }
 
     // Delete set

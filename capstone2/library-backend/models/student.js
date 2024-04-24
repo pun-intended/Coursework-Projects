@@ -16,12 +16,12 @@ class Student {
      */
     static async create(data){
         const res = await db.query(
-            `INSERT INTO students (id, first_name, last_name, level)
+            `INSERT INTO students (id, first_name, last_name, class_id)
             VALUES (DEFAULT, $1, $2, $3)
             RETURNING id, first_name, last_name, level`,
                 [data.first_name, 
                 data.last_name, 
-                data.level]
+                data.class_id]
         )
         return res.rows[0]
     }
@@ -38,10 +38,11 @@ class Student {
         SELECT  S.id,
                 S.first_name,
                 S.last_name,
-                S.level,
+                S.class_id,
                 ARRAY(
-                    SELECT book_id 
+                    SELECT isbn 
                     FROM borrow_record
+                    JOIN books ON books.id = borrow_record.book_id
                     WHERE student_id = s.id
                 ) AS has_read, 
                 q2.title,
@@ -74,7 +75,7 @@ class Student {
     static async getStudent(studentId){
 
         const res = await db.query(
-            `SELECT id, first_name, last_name, level
+            `SELECT id, first_name, last_name, class_id
             FROM students
             WHERE id = $1`,
             [studentId]
@@ -89,25 +90,25 @@ class Student {
     /**
      * Return array of book that have not been read by a given student
      * 
-     * {id} => [{id, isbn, title, stage, condition, available}, ...]
+     * {Studentid, schoolId} => [{isbn, title, stage, available}, ...]
      */
-    static async getUnreadBooks(studentId){
+    static async getUnreadBooks(studentId, schoolId){
         const unread = await db.query(
-            `SELECT id, 
-                    isbn, 
+            `SELECT isbn, 
                     title, 
                     stage, 
-                    condition,
-                    id NOT IN (SELECT b.id FROM books b JOIN borrow_record rec
-                        ON rec.book_id = b.id
-                        WHERE rec.return_date IS NULL) AS available
-            FROM books
-            WHERE id NOT IN
-                (SELECT book_id
+                    isbn IN (SELECT B.isbn FROM books B 
+                        FULL JOIN borrow_record rec ON rec.book_id = B.id
+                        JOIN book_sets set ON set.set_id = B.set_id
+                        WHERE (rec.return_date IS NOT NULL OR rec.borrow_date IS NULL) and set.school_id = $1) AS available
+            FROM master_books
+            WHERE isbn NOT IN
+                (SELECT isbn
                     FROM borrow_record
-                    WHERE student_id = $1)`,
-            [studentId]
-        )
+                    JOIN books ON books.id = borrow_record.book_id
+                    WHERE student_id = $2)`,
+            [schoolId, studentId]
+        );
         return unread.rows;
     }
 
@@ -115,7 +116,20 @@ class Student {
     /**
      * Set students class
      */
-    static async setClass(studentId, classId){}
+    static async setClass(studentId, classId){
+
+        const updatedClass = await db.query(
+            `UPDATE students
+            SET (class_id = $1)
+            WHERE student_id = $2
+            RETURNING student_id`,
+            [classId, studentId]
+        );
+
+        if(!updatedClass.rows[0]) throw NotFoundError(`Incorrect student ID or class ID`);
+
+        return updatedClass.rows[0];
+    }
 
         /**
      * Return an array with book IDs for books student has read.
@@ -125,16 +139,35 @@ class Student {
      */
     static async getReadBooks(studentId){
         const booksRead = await db.query(
-            `SELECT books.id, books.isbn, books.title, books.stage, books.condition
-            FROM books
-            JOIN borrow_record ON borrow_record.book_id = books.id
-            WHERE borrow_record.student_id = $1`,
+            `SELECT B.isbn, M.title, M.stage, B.condition
+            FROM books B
+            JOIN master_books M ON M.isbn = B.isbn
+            JOIN borrow_record rec ON rec.book_id = B.id
+            WHERE rec.student_id = $1`,
             [studentId]
         )
 
         if(!booksRead.rows[0]) throw new NotFoundError(`No books found for student ID ${studentId}`)
 
         return booksRead;
+    }
+
+    /**
+     * Add list of students to a given class
+     */
+    static async addToClass(classId, students){
+        
+        const params = []
+        for(let i = 2; i < students.length - 1; i++){
+            params.push(`$${i}`)
+        }
+
+        const addStudents = await db.query(
+            `UPDATE students
+            SET class_id = $1
+            WHERE student_id IN (` + params.join(',') + `)`,
+            [classId, ...students]
+        )
     }
     
 }

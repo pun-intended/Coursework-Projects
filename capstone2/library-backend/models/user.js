@@ -13,9 +13,9 @@ class User {
      * Create a new user with the given data
      * 
      *  { data }=> 
-     *      {id, first_name, last_name, isAdmin}
+     *      {id, first_name, last_name, class_id, school_id, role}
      * 
-     * Data should be {id, first_name, last_name, password, is_admin}
+     * Data should be {id, first_name, last_name, class_id, school_id, password, role}
      * 
      * Throws BadRequestError if id found
      */
@@ -38,11 +38,13 @@ class User {
             (id,
             first_name,
             last_name,
+            class_id,
+            school_id,
             password,
-            is_admin)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING id, first_name, last_name, is_admin`,
-        [data.id, data.first_name, data.last_name, hashedPassword, data.is_admin]);
+            role)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        RETURNING id, first_name, last_name, class_id, school_id, role`,
+        [data.id, data.first_name, data.last_name, data.class_id, data.school_id, hashedPassword, data.role]);
 
         const user = res.rows[0];
 
@@ -52,13 +54,13 @@ class User {
     /**
      * Get a given user
      * 
-     * {id} => {id, first_name, last_name, isAdmin}
+     * {id} => {id, first_name, last_name, class_id, school_id, isAdmin}
      * 
      * Throws NotFoundError if user id not found
      */
     static async getUser(id){
         const res = await db.query(`
-        SELECT id, first_name, last_name, is_admin
+        SELECT id, first_name, last_name, class_id, school_id, role
         FROM users
         WHERE id = $1`,
         [id]);
@@ -73,11 +75,11 @@ class User {
     /**
      * Get all users
      * 
-     * Returns {users: [{id, first_name, last_name, is_admin}, ...]}
+     * Returns {users: [{id, first_name, last_name, class_id, school_id, role}, ...]}
      */
     static async getAll(){
         const res = await db.query(`
-        SELECT id, first_name, last_name, is_admin
+        SELECT id, first_name, last_name, class_id, school_id, role
         FROM users`);
         
         return res.rows;
@@ -130,7 +132,9 @@ class User {
                           RETURNING id,
                                     first_name,
                                     last_name,
-                                    is_admin`;
+                                    class_id,
+                                    school_id,
+                                    role`;
         const result = await db.query(querySql, [...values, id]);
         const user = result.rows[0];
     
@@ -153,7 +157,9 @@ class User {
                 password, 
                 first_name,
                 last_name,
-                is_admin
+                class_id,
+                school_id,
+                role
         FROM users
         WHERE id = $1`,
         [data.id]);
