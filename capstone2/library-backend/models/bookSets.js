@@ -2,21 +2,58 @@
 const { NotFoundError } = require('../expressError.js')
 
 const db = require('../db')
-// TODO - fix dateTime formatting
 
 class BookSet {
-    // Create new set
-    static async createSet(school_id, stage){
-        // if no stage, create whole set
-        // check if last school set contains stage
-        // create stage in last set if not, create new set if has
+    /**
+     * Create a new set of books
+     * @param {*} schoolId 
+     */
+    static async create(schoolId, stage = null){
+        const newSet = await db.query(
+            `INSERT INTO book_sets (school_id)
+            VALUES ($1)
+            RETURNING set_id`,
+            [schoolId]
+        );
+
+        const setId = newSet.rows[0];
+        
+        if(!stage){
+        const newBookSet = await db.query(
+            `INSERT INTO books (isbn, set_id) 
+            SELECT isbn, set_id FROM master_books                                       
+            CROSS JOIN (SELECT set_id FROM book_sets WHERE set_id = $1) AS sets
+            RETURNING set_id
+            `,
+            [setId]
+            );
+        }
+
+        const newBookSet = await db.query(
+            `INSERT INTO books (isbn, set_id) 
+            SELECT isbn, set_id FROM master_books                                       
+            CROSS JOIN (SELECT set_id FROM book_sets WHERE set_id = $1) AS sets
+            WHERE stage = $2
+            RETURNING set_id
+            `,
+            [setId, stage]
+            );
+
+        return newBookSet.rows[0]
     }
 
     // Delete set
-    static async deleteSet(set_id){
-        // find set
-        // if none, return error
-        // else delete set, return set_id
+    static async remove(setId){
+        const deleteSet = db.query(
+            `DELETE FROM book_sets
+            WHERE set_id = $1
+            RETURNING set_id`,
+            [setId]
+        );
+
+        if (!deleteSet.rows[0]) throw NotFoundError(`No set found with ID ${setId}`)
+
+        return deleteSet.row[0];
     }
 
 }
