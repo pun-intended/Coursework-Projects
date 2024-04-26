@@ -9,6 +9,15 @@ const { sqlForPartialUpdate } = require('../helpers/sql');
 // ----- After completion
 class Class {
 
+    // get all classes
+    static async getAll(){
+        const allClasses = await db.query(
+            `SELECT id, name, school_id
+            FROM classes`
+        );
+        return allClasses.rows;
+    }
+
     /**
      * Create new class with given name
      */
@@ -42,7 +51,7 @@ class Class {
     /**
      * Update class information
      */
-    static async patchClass(classId, data){
+    static async patch(classId, data){
         
         const {setCols, values} = sqlForPartialUpdate(data)
 
