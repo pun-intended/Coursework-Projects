@@ -48,7 +48,7 @@ function ensureLoggedIn(req, res, next) {
  *  If not, raises Unauthorized.
  */
 
-function ensureSchoolAdmin(req, res, next) {
+function ensureAdmin(req, res, next) {
   try {
     const user = res.locals.user;
     const isAdmin = (user.role === 'master' || user.role === 'school')
@@ -102,6 +102,6 @@ module.exports = {
   authenticateJWT,
   ensureLoggedIn,
   ensureMaster,
-  ensureSchoolAdmin,
+  ensureAdmin,
   ensureCorrectUserOrAdmin,
 };
