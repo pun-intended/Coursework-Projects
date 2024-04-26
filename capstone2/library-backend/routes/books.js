@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureLoggedIn, ensureMaster, ensureSchoolAdmin } = require("../middleware/auth");
+const { ensureLoggedIn, ensureMaster, ensureAdmin } = require("../middleware/auth");
 const Book = require("../models/book");
 
 const checkInSchema = require("../schemas/checkIn.json");
@@ -15,14 +15,13 @@ const checkOutSchema = require("../schemas/checkOut.json");
 const router = new express.Router();
 
 
-/** GET / {books: [{id, isbn, title, stage, condition, available}...]}
+/** GET / {books: [{isbn, title, stage, available}...]}
  * 
  * Returns all books in library
  * 
  * Auth: login
  */
 
-// TODO - add stage filter
 router.get("/", ensureLoggedIn, async function (req, res, next) {
     const books = await Book.getAllBooks();
 
@@ -118,25 +117,19 @@ router.get("/:id", ensureLoggedIn, async function (req, res, next) {
     }
 })
 
-// TODO ---- STRETCH 
-
-/**
- * Add book set
- * 
- * Auth: School
- */
-router.push("/new/:stage", ensureSchoolAdmin, async function(req, res, next) {
-    try{
-        
-    }
-})
-
 /**
  * Delete book
  * 
- * Auth: admin
+ * Auth: Admin
  */
-
+router.delete("/:id", ensureAdmin, async function (req, res, next) {
+    try {
+        const book = await Book.remove(req.params.id);
+        return res.json({ book })
+    } catch (e) {
+        return next(e);
+    }
+})
 
 /**
  * Update book 

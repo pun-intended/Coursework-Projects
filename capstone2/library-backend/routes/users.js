@@ -20,9 +20,9 @@ const router = new express.Router();
  * 
  * Returns JWT for user
  * 
- * Auth: admin
+ * Auth: Admin
  */
-router.post("/", ensureAdmin, async function (req, res, next) {
+router.post("/create", ensureAdmin, async function (req, res, next) {
     // Add Validation
     
     try{
@@ -43,9 +43,9 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  * 
  * user is {id, first_name, last_name, is_admin}
  * 
- * Auth: login
+ * Auth: Admin
  */
-router.get("/", ensureLoggedIn, async function (req, res, next) {
+router.get("/", ensureAdmin, async function (req, res, next) {
     try{
         const users = await User.getAll();
         return res.json({users})
@@ -58,7 +58,7 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
  * 
  * user is {id, first_name, last_name, is_admin}
  * 
- * Auth: admin, or same user
+ * Auth: Admin, or same user
  */
 router.get("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
     try{
@@ -75,7 +75,7 @@ router.get("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
  * 
  * Returns {updated: {id, first_name, last_name, is_admin}}
  * 
- * Auth: admin or same user
+ * Auth: Admin or same user
  */
 // QUESTION - Best way to prevent someone from changing admins status while allowing admin change
 router.patch("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
@@ -97,7 +97,7 @@ router.patch("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
  * 
  * Delete user
  * 
- * Auth: admin or same user
+ * Auth: Admin or same user
  */
 router.delete("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
     try{
