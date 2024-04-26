@@ -45,22 +45,20 @@ class Book {
     }
 
     /**
-     * ---OK
      * Given a book ID, check the book in
      * 
      * {data} => {id, return_date}
      * 
-     * {data} should be {book_id, date}
+     * {data} should be {book_id, date, condition}
      */
     static async checkIn(data){
         const res = await db.query(
             `UPDATE borrow_record
-            SET return_date = $1
-            WHERE book_id = $2 AND return_date IS NULL
+            SET return_date = $1, condition = $2
+            WHERE book_id = $3 AND return_date IS NULL
             RETURNING id, return_date
             `,
-            [data.date, 
-            data.book_id]
+            [data.date, data.condition, data.book_id]
         )
         const checkIn = res.rows[0]
 
@@ -72,7 +70,6 @@ class Book {
     }
 
     /**
-     * ---OK
      * Get all book data given the ID
      * 
      * {book_id} => {book_id, isbn, title, stage, condition, student}
@@ -120,7 +117,7 @@ class Book {
      * ---OK
      * Get all books in school library.
      * 
-     * Returns [{id, isbn, title, stage, available}, ...] 
+     * Returns [{isbn, title, stage, available}, ...] 
      */
     static async getAllBooks(school_id, stage){
 
