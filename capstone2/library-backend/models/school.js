@@ -8,6 +8,15 @@ const { NotFoundError } = require('../expressError');
 // ----- After completion
 class School {
 
+    // get all schools
+    static async getAll(){
+        const allSchools = db.query(
+            `SELECT id, name
+            FROM schools`
+        );
+        return allSchools.rows;
+    }
+
     // Add school
     static async create(name){
         const newSchool = db.query(
