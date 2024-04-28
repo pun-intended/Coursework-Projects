@@ -182,7 +182,7 @@ INSERT INTO master_books (isbn, title, stage)
 VALUES
     ('014130670X', 'Turtle and Snake Go Camping', 1),
 	('448457636', 'Bake, Mice, Bake!', 1),
-	('448461579', 'We Are Twins ', 1),
+	('448461579', 'We Are Twins', 1),
 	('448461587', 'Max Has a Fish', 1),
 	('448463059', 'Cat Days', 1),
 	('448462648', 'Clara and Clem Take a Ride', 1),

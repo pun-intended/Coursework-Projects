@@ -30,7 +30,7 @@ class School {
     } 
 
     // Edit school details
-    static async update(schoolId, name){
+    static async patch(schoolId, name){
         const updateSchool = db.query(
             `UPDATE schools
             SET (name = $1)
