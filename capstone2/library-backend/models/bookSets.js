@@ -4,6 +4,22 @@ const { NotFoundError } = require('../expressError.js')
 const db = require('../db')
 
 class BookSet {
+    
+    /**
+     * Get all books sets in a given school
+     * 
+     */
+    static async getAll(schoolId){
+        const allSets = await db.query(
+            `SELECT isbn, set_id, title, stage
+            FROM books 
+            JOIN book_sets ON book.set_id = book_sets.set_id
+            WHERE school_id = $1
+            `,
+            [schoolId]
+        )
+    }
+    
     /**
      * Create a new set of books
      * @param {*} schoolId 
@@ -42,9 +58,32 @@ class BookSet {
         return newBookSet.rows[0]
     }
 
-    // Delete set
+    /**
+     * Patch book set to change schools
+     * 
+     */
+    static async patch(schoolId, setId){
+        const patchedSet = await db.query(
+            `UPDATE book_sets
+            SET school_id = $1
+            WHERE set_id = $2
+            RETURNING set_id`,
+            [schoolId, setId]
+        );
+        
+        if(!patchedSet.rows[0]) throw NotFoundError(`No set found with ID ${setId}`);
+
+        return patchedSet.rows[0];
+    }
+
+    /**
+     * Delete set of books
+     * 
+     * @param {*} setId 
+     * @returns 
+     */
     static async remove(setId){
-        const deleteSet = db.query(
+        const deleteSet = await db.query(
             `DELETE FROM book_sets
             WHERE set_id = $1
             RETURNING set_id`,
