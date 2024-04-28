@@ -109,10 +109,10 @@ describe("getBook", function() {
 
         expect(book).toEqual({
             book_id: 103, 
-            isbn: '978-0-7653-2637-9', 
-            title: 'Oathbringer', 
-            stage: 2, 
-            condition: 'good'
+            isbn: '448461579', 
+            title: 'We Are Twins', 
+            stage: 1, 
+            condition: 'Great'
         });
     });
 
@@ -121,15 +121,15 @@ describe("getBook", function() {
 
         expect(book).toEqual({
             book_id: 104, 
-            isbn: '978-0765326386', 
-            title: 'Rhythms of War', 
-            stage: 3, 
-            condition: 'good', 
+            isbn: '448461587', 
+            title: 'Max Has a Fish', 
+            stage: 1, 
+            condition: 'Great', 
             student: {
                 id: 1001, 
-                first_name: 'Charlie', 
-                last_name: 'Kelly', 
-                level: 'K1', 
+                first_name: 'Caspar', 
+                last_name: 'Stedson', 
+                class_id: '1006', 
                 borrow_date: '2023-10-24'}
         });
     });
@@ -146,17 +146,17 @@ describe("getBook", function() {
 
 // getAllBooks
 describe("getAllBooks", function() {
+    // TODO - test failure without school id
+    // TODO - test refined search with stage
     test("works", async function() {
-        let books = await Book.getAllBooks();
+        let books = await Book.getAllBooks(101);
 
-        expect(books.length).toEqual(7);
+        expect(books.length).toEqual(33);
 
         expect(books[0]).toEqual({
-            id: 101, 
-            isbn: '978-0-7653-2635-5', 
-            title: 'The Way of Kings', 
-            stage: 2, 
-            condition: 'good',
+            isbn: '014130670X', 
+            title: 'Turtle and Snake Go Camping', 
+            stage: 1, 
             available: true
         });
     });
@@ -165,19 +165,19 @@ describe("getAllBooks", function() {
 // getOutstanding
 describe("getOutstanding", function() {
     test("works", async function(){
-        let outstandingBooks = await Book.getOutstanding();
+        let outstandingBooks = await Book.getOutstanding(101);
 
         expect(outstandingBooks.length).toEqual(5)
 
         expect(outstandingBooks[0]).toEqual({
             book_id: 104, 
-            isbn: '978-0765326386', 
-            title: 'Rhythms of War', 
-            stage: 3, 
-            condition: 'good',
+            isbn: '448461587', 
+            title: 'Max Has a Fish', 
+            stage: 1, 
+            condition: 'Great',
             student_id: 1001, 
-            first_name: 'Charlie', 
-            last_name: 'Kelly', 
+            first_name: 'Caspar', 
+            last_name: 'Stedson', 
             borrow_date: '2023-10-24'
         });
     });

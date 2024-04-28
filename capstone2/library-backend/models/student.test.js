@@ -19,14 +19,14 @@ describe("create", function() {
     const newStudent = {
         first_name: "test",
         last_name: "student",
-        level: "k2"
+        class_id: "1002"
     }
     test("works", async function(){
         let student = await Student.create(newStudent);
         expect(student).toEqual({
             first_name: "test",
             last_name: "student",
-            level: "k2",
+            class_id: "k2",
             id: expect.any(Number)
         });
     });
