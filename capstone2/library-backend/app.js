@@ -15,6 +15,9 @@ const authRoutes = require("./routes/auth");
 const booksRoutes = require("./routes/books");
 const usersRoutes = require("./routes/users");
 const studentsRoutes = require("./routes/students");
+const classesRoutes = require("./routes/classes");
+const schoolsRoutes = require("./routes/schools")
+const setsRoutes = require("./routes/sets")
 
 const morgan = require("morgan");
 
@@ -35,6 +38,10 @@ app.use("/auth", authRoutes);
 app.use("/books", booksRoutes);
 app.use("/users", usersRoutes);
 app.use("/students", studentsRoutes);
+app.use("/classes", classesRoutes);
+app.use("/schools", schoolsRoutes);
+app.use("/sets", setsRoutes);
+
 
 app.get("/test", (req, res, next) => {
     res.send({result: "connected"})
