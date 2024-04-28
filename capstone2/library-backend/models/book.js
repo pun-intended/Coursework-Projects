@@ -119,20 +119,22 @@ class Book {
      * 
      * Returns [{isbn, title, stage, available}, ...] 
      */
-    static async getAllBooks(school_id, stage){
+    static async getAllBooks(school_id, stage = null){
 
         // Will the available field cause false positives when a book is taken out a second time? Limit IDs to null return dates?
-        const books = await db.query(
+        const baseQuery = 
             `SELECT isbn,
-                    title,
-                    stage,
-                    isbn IN (SELECT B.isbn FROM books B
-                                    FULL JOIN borrow_record rec ON rec.book_id = B.id
-                                    JOIN book_sets set ON set.set_id = b.set_id
-                            WHERE (rec.return_date IS NOT NULL OR rec.borrow_date IS NULL) AND set.school_id = $1) AS available
+            title,
+            stage,
+            isbn IN (SELECT B.isbn FROM books B
+                            FULL JOIN borrow_record rec ON rec.book_id = B.id
+                            JOIN book_sets set ON set.set_id = b.set_id
+                    WHERE (rec.return_date IS NOT NULL OR rec.borrow_date IS NULL) AND set.school_id = $1) AS available
             FROM master_books`
-            [school_id]
-        )
+        
+        const stageFilter = stage ? ` WHERE stage = ${stage}`: ""
+
+        const books = await db.query(baseQuery.concat(stageFilter), [school_id])
         return books.rows
     }
 
@@ -141,7 +143,8 @@ class Book {
      * 
      * Returns [{book_id, isbn, title, stage, condition, student_id, first_name, last_name, borrow_date}, ...]
      */
-    static async getOutstanding(){
+    static async getOutstanding(schoolId){
+        // console.log(`school Id - ` + schoolId)
         const books = await db.query(
             `SELECT B.id AS book_id,
                     M.isbn,
@@ -157,7 +160,8 @@ class Book {
             JOIN book_sets AS set ON set.set_id = B.set_id
             JOIN master_books AS M on B.isbn = M.isbn
             JOIN students AS S on S.id = rec.student_id
-            WHERE rec.return_date IS NULL AND set.school_id = 101`
+            WHERE rec.return_date IS NULL AND set.school_id = $1`,
+            [schoolId]
         )
         return books.rows
     }
