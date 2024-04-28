@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureMaster, ensureAdmin, ensureAdmin } = require("../middleware/auth");
+const { ensureMaster, ensureAdmin } = require("../middleware/auth");
 const Class = require("../models/school");
 const School = require("../models/school");
 
@@ -59,3 +59,4 @@ router.delete("/:id", ensureMaster, async function (req, res, next){
         return next(e);
     }
 })
+module.exports = router;

@@ -6,7 +6,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureLoggedIn, ensureMaster, ensureAdmin, ensureAdmin } = require("../middleware/auth");
+const { ensureLoggedIn, ensureMaster, ensureAdmin } = require("../middleware/auth");
 const Class = require("../models/class");
 
 const router = new express.Router();

@@ -23,7 +23,7 @@ const router = new express.Router();
  */
 
 router.get("/", ensureLoggedIn, async function (req, res, next) {
-    const books = await Book.getAllBooks();
+    const books = await Book.getAllBooks(req.query.schoolId, req.query.stage);
 
     return res.json({ books });
 })
@@ -37,7 +37,7 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
  * Auth: login
  */
 router.get("/outstanding", ensureLoggedIn, async function (req, res, next) {
-    const books = await Book.getOutstanding();
+    const books = await Book.getOutstanding(req.query.schoolId);
 
     return res.json({ books });
 })

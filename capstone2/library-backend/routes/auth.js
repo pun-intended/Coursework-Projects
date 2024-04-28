@@ -35,7 +35,7 @@ router.post("/register", async function(req, res, next){
             throw new BadRequestError(errs)
         }
         const data = req.body;
-        const user = await User.create({...data, is_admin: false});
+        const user = await User.create({...data, role: "user"});
     
         const token = createToken(user);
         return res.status(201).json({token});

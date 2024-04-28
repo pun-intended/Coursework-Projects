@@ -1,18 +1,27 @@
 "use strict";
 // TODO - add student method (admin)
 
-/** Routes for companies. */
+/** Routes for students. */
 
 // const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureLoggedIn } = require("../middleware/auth");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 const Student = require("../models/student");
 
 // const schema = require("../schemas/schema.json");
 
 const router = new express.Router();
+
+router.post("/", ensureAdmin, async function (req, res, next) {
+    try{
+        const newStudent = await Student.create(req.body);
+        req.return({ newStudent });
+    }catch(e){
+        return next(e);
+    }
+})
 
 /** GET / => {students: [{id, first_name, last_name, level}]}
  * 
