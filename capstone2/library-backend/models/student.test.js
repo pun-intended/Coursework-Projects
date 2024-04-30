@@ -26,7 +26,7 @@ describe("create", function() {
         expect(student).toEqual({
             first_name: "test",
             last_name: "student",
-            class_id: "k2",
+            class_id: "1002",
             id: expect.any(Number)
         });
     });
@@ -39,11 +39,11 @@ describe("getAllStudents", function(){
         expect(students.length).toEqual(6)
         expect(students[0]).toEqual({
             id: 1001, 
-            first_name: 'Charlie', 
-            last_name: 'Kelly', 
-            level: 'K1',
-            title: "Rhythms of War",
-            isbn: "978-0765326386",
+            first_name: 'Caspar', 
+            last_name: 'Stedson', 
+            class_id: "1006",
+            title: "Max Has a Fish",
+            isbn: "448461587",
             book_id: 104,
             borrow_date: "2023-10-24"
         });
@@ -56,9 +56,9 @@ describe("getStudent", function(){
 
         expect(student).toEqual({
             id: 1001, 
-            first_name: 'Charlie', 
-            last_name: 'Kelly', 
-            level: 'K1'
+            first_name: 'Caspar', 
+            last_name: 'Stedson', 
+            class_id: "1006"
         });
     });
 
@@ -76,13 +76,13 @@ describe("getUnread", function(){
     test("works", async function(){
         let unread = await Student.getUnreadBooks(1001);
 
-        expect(unread.length).toBe(4)
+        expect(unread.length).toBe(6)
         expect(unread[0]).toEqual({
             id: 101, 
-            isbn: '978-0-7653-2635-5', 
-            title: 'The Way of Kings', 
-            stage: 2, 
-            condition: 'good',
+            isbn: '014130670X', 
+            title: 'Turtle and Snake Go Camping', 
+            stage: 1, 
+            condition: 'Great',
             available: true
         });
     });

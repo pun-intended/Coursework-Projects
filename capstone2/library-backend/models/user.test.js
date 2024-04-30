@@ -23,7 +23,7 @@ describe("create", function(){
         first_name: "test", 
         last_name: "user", 
         password: "password", 
-        is_admin: false
+        role: "user"
     }
 
     test("works", async function(){
@@ -33,7 +33,7 @@ describe("create", function(){
             id: 1, 
             first_name: "test", 
             last_name: "user", 
-            is_admin: false
+            role: "user"
         });
 
         const found = await db.query("SELECT * FROM users WHERE id = 1");
@@ -44,10 +44,10 @@ describe("create", function(){
 
     let dupeId = {
         id: 10001, 
-        first_name: "test", 
-        last_name: "user", 
+        first_name: "user", 
+        last_name: "name", 
         password: "password", 
-        is_admin: false
+        role: "user"
     };
 
     test("throws BadRequestError for duplicate IDs", async function(){
@@ -67,9 +67,9 @@ describe("getUser", function(){
         let user = await User.getUser(10001);
         expect(user).toEqual({
             id: 10001, 
-            first_name: "test", 
-            last_name: "user", 
-            is_admin: false
+            first_name: "user", 
+            last_name: "name", 
+            role: "user"
         });
     });
 
@@ -90,9 +90,9 @@ describe("getAll", function(){
         expect(users.length).toEqual(3)
         expect(users[0]).toEqual({
             id: 10001, 
-            first_name: "test", 
-            last_name: "user", 
-            is_admin: false
+            first_name: "user", 
+            last_name: "name", 
+            role: "user"
         });
     });
 });
@@ -121,7 +121,7 @@ describe("updateUser", function(){
     let newData = {
         first_name: "newFirst",
         last_name: "newLast",
-        is_admin: true 
+        role: "school_admin"
         };
     test("works", async function(){
         let updatedData = await User.updateUser(10001, newData);
@@ -138,9 +138,9 @@ describe("updateUser", function(){
           });
           expect(passUpdate).toEqual({
             id: 10001,
-            first_name: "test",
-            last_name: "user",
-            is_admin: false
+            first_name: "user",
+            last_name: "name",
+            role: "user"
           });
           const found = await db.query("SELECT * FROM users WHERE id = 10001");
           expect(found.rows.length).toEqual(1);
@@ -167,9 +167,9 @@ describe("authenticate", function(){
         let user = await User.authenticate(data);
         expect(user).toEqual({
             id: 10001,
-            first_name: "test",
-            last_name: "user",
-            is_admin: false 
+            first_name: "user",
+            last_name: "name",
+            role: "user"
         });
     });
 
