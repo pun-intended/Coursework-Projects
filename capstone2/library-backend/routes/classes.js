@@ -44,6 +44,22 @@ router.post("/new", ensureAdmin, async function(req, res, next){
     };
 });
 
+/** GET /id => {class_id, name, school_id}
+ * 
+ * Get id, name, and school id of a given class
+ * 
+ * Auth: Login
+ */
+
+router.get(":/id", ensureLoggedIn, async function (req, res, next) {
+    try{
+        const classInfo = await Class.get(req.params.id);
+        return classInfo;
+    } catch(e) {
+        return next(e)
+    }
+})
+
 /** PATCH /id {name} => {class_id, name, school_id}
  * 
  * Change the name of a class
