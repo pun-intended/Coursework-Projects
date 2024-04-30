@@ -115,8 +115,6 @@ class User {
      * 
      * Throws NotFoundError if id not found
      */
-    // TODO - Check all instances of first_name etc for naming conventions
-    // QUESTION - Why does jobly update method throw BadRequestError?
     static async updateUser(id, data) {
         if (data.password) {
           data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
