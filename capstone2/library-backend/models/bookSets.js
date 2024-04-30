@@ -59,7 +59,7 @@ class BookSet {
     }
 
     /**
-     * Patch book set to change schools
+     * Patch book set to change schools of entire set
      * 
      */
     static async patch(schoolId, setId){
