@@ -18,7 +18,7 @@ class Student {
         const res = await db.query(
             `INSERT INTO students (id, first_name, last_name, class_id)
             VALUES (DEFAULT, $1, $2, $3)
-            RETURNING id, first_name, last_name, level`,
+            RETURNING id, first_name, last_name, class_id`,
                 [data.first_name, 
                 data.last_name, 
                 data.class_id]
@@ -48,17 +48,20 @@ class Student {
                 q2.title,
                 q2.isbn,
                 q2.book_id,
-                q2.borrow_date
+                q2.borrow_date,
+                schools.id AS school_id
         FROM students S
+        JOIN classes C ON C.id = S.class_id
+        JOIN schools ON schools.id = C.school_id
         LEFT OUTER JOIN 
             (SELECT B.id as book_id, 
-                    B.title, 
+                    M.title, 
                     B.isbn, 
                     rec.borrow_date, 
                     rec.student_id
             FROM books as B 
-            JOIN borrow_record AS rec
-            ON B.id = rec.book_id
+            JOIN master_books M ON M.isbn = B.isbn
+            JOIN borrow_record AS rec ON B.id = rec.book_id
             WHERE return_date IS NULL) AS q2 
         ON s.id = q2.student_id`)
         
