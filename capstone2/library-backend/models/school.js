@@ -17,6 +17,16 @@ class School {
         return allSchools.rows;
     }
 
+    // Get school by ID
+    static async get(id){
+        const school = db.query(
+            ` SELECT id, name
+            FROM schools
+            WHERE id = $1`,
+            [id]
+        );
+        return school.rows[0];
+    }
     // Add school
     static async create(name){
         const newSchool = db.query(
