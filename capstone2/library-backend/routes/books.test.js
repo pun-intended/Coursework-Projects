@@ -13,6 +13,7 @@ const {
     u1Token,
     u2Token,
     adminToken,
+    masterToken
     } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -24,25 +25,26 @@ describe("GET /books/", function() {
     test("works for users", async function(){
         const resp = await request(app)
             .get("/books")
+            .query({schoolId: "101"})
             .set("authorization", `Bearer ${u1Token}`);
 
         expect(resp.statusCode).toEqual(200);
         
         const allBooks = resp.body.books;
 
-        expect(allBooks.length).toEqual(7);
+        expect(allBooks.length).toEqual(22);
         expect(allBooks[0]).toEqual({
-            id: 101, 
-            isbn: '978-0-7653-2635-5',
-            title: 'The Way of Kings', 
-            stage: 2, 
-            condition: 'good'
+            isbn: '014130670X', 
+            title: 'Turtle and Snake Go Camping', 
+            stage: 1, 
+            available: true
         });
     });
 
     test("unauth for anon", async function(){
         const resp = await request(app)
-            .get("/books");
+            .get("/books")
+            .query({schoolId: "101"});
             
         expect(resp.statusCode).toEqual(401);
     });
@@ -58,10 +60,10 @@ describe("GET /books/:id", function() {
         expect(resp.body).toEqual({
             book: {
             book_id: 101, 
-            isbn: '978-0-7653-2635-5',
-            title: 'The Way of Kings', 
-            stage: 2, 
-            condition: 'good'
+            isbn: '014130670X', 
+            title: 'Turtle and Snake Go Camping', 
+            stage: 1,
+            condition: 'Great'
             }});
     });
 
@@ -85,6 +87,7 @@ describe("GET /books/outstanding", function() {
     test("works for users", async function(){
         const resp = await request(app)
         .get("/books/outstanding")
+        .query({schoolId: "101"})
         .set("authorization", `Bearer ${u1Token}`);
         
         expect(resp.statusCode).toEqual(200);
@@ -94,20 +97,21 @@ describe("GET /books/outstanding", function() {
         expect(books.length).toEqual(5);
         expect(books[0]).toEqual({
             book_id: 104, 
-            isbn: '978-0765326386', 
-            title: 'Rhythms of War', 
-            stage: 3, 
-            condition: 'good',
-            student_id: 1001,
-            first_name: "Charlie",
-            last_name: "Kelly",
-            borrow_date: "2023-10-24"
+            isbn: '448461587', 
+            title: 'Max Has a Fish', 
+            stage: 1, 
+            condition: 'Great',
+            student_id: 1001, 
+            first_name: 'Caspar', 
+            last_name: 'Stedson', 
+            borrow_date: '2023-10-24'
             });
     });
 
     test("unauth for anon", async function(){
         const resp = await request(app)
             .get("/books/outstanding")
+            .query({schoolId: "101"})
 
             expect(resp.statusCode).toEqual(401);
     });
@@ -118,7 +122,7 @@ describe("POST /books/checkout", function() {
         const resp = await request(app)
             .post("/books/checkout")
             .send({
-                book_id: 103,
+                book_id: 106,
                 student_id: 1002, 
                 date: "12-12-2024"})
             .set("authorization",`Bearer ${u1Token}`);
@@ -127,7 +131,7 @@ describe("POST /books/checkout", function() {
         expect(resp.body).toEqual({
             borrowed: {
                 id: expect.any(Number),
-                book_id: 103,
+                book_id: 106,
                 student_id: 1002,
                 borrow_date: "12-12-2024"
             }
@@ -138,7 +142,7 @@ describe("POST /books/checkout", function() {
         const resp = await request(app)
             .post("/books/checkout")
             .send({
-                book_id: 103,
+                book_id: 106,
                 student_id: 1002, 
                 date: "12-12-2024"});
         

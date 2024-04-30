@@ -3,7 +3,6 @@
 const request = require("supertest");
 
 const app = require("../app");
-const Student = require("../models/student")
 
 const {
     commonBeforeAll,
@@ -11,8 +10,7 @@ const {
     commonAfterEach,
     commonAfterAll,
     u1Token,
-    u2Token,
-    adminToken,
+    adminToken
     } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -24,50 +22,57 @@ describe("GET /students/", function() {
     test("works for users", async function(){
         const resp = await request(app)
             .get("/students")
-            .set("authorization", `Bearer ${u1Token}`)
+            .set("authorization", `Bearer ${adminToken}`);
         
         const students = resp.body.students
         expect(resp.statusCode).toEqual(200);
         expect(students.length).toEqual(6);
         expect(students[0]).toEqual({
             id: 1001, 
-            first_name: 'Charlie', 
-            last_name: 'Kelly', 
-            level: 'K1'
-        })
+            first_name: 'Caspar', 
+            last_name: 'Stedson', 
+            class_id: "1006"
+        });
+    });
 
-    })
-
-    test("unauth for anon", async function(){
+    test("unauth for user", async function(){
         const resp = await request(app)
             .get("/students")
+            .set("authorization", `Bearer ${u1Token}`);
         
-        expect(resp.statusCode).toEqual(401)
-    })
+        expect(resp.statusCode).toEqual(401);
+    }); 
     
-})
+    test("unauth for anon", async function(){
+        const resp = await request(app)
+            .get("/students");
+        
+        expect(resp.statusCode).toEqual(401);
+    }); 
+});
 
 describe("GET /students/:id", function() {
     test("works for users", async function(){
         const resp = await request(app)
             .get("/students/1001")
-            .set("authorization", `Bearer ${u1Token}`)
+            .set("authorization", `Bearer ${u1Token}`);
 
         expect(resp.body).toEqual({
             student: {
-            id: 1001, 
-            first_name: 'Charlie', 
-            last_name: 'Kelly', 
-            level: 'K1'
-    }})
-    })
+                id: 1001, 
+                first_name: 'Caspar', 
+                last_name: 'Stedson', 
+                class_id: "1006"
+            }
+        });
+    });
 
     test("unauth for anon", async function(){
         const resp = await request(app)
-            .get("/students/1001")
+            .get("/students/1001");
         
-        expect(resp.statusCode).toEqual(401)
-    })
+        expect(resp.statusCode).toEqual(401);
+    });
 
     test("not found if student not found", async function(){
         const resp = await request(app)
@@ -75,38 +80,37 @@ describe("GET /students/:id", function() {
             .set("authorization", `Bearer ${u1Token}`);
 
         expect(resp.statusCode).toEqual(404);
-    })
-})
+    });
+});
 
 describe("GET /students/:id/unread", function() {
     test("works for users", async function(){
         const resp = await request(app)
             .get("/students/1001/unread")
-            .set("authorization", `Bearer ${u1Token}`)
+            .set("authorization", `Bearer ${u1Token}`);
 
         const unread = resp.body.unread
-        expect(unread.length).toEqual(4)
+        expect(unread.length).toEqual(7)
         expect(unread[0]).toEqual({
-            id: 101, 
-            isbn: '978-0-7653-2635-5',
-            title: 'The Way of Kings', 
-            stage: 2, 
-            condition: 'good'
-        })
-    })
+            isbn: '014130670X', 
+            title: 'Turtle and Snake Go Camping', 
+            stage: 1,
+            available: true
+        });
+    });
 
     test("unauth for anon", async function(){
         const resp = await request(app)
-            .get("/students/1001/unread")
+            .get("/students/1001/unread");
 
-        expect(resp.statusCode).toEqual(401)
-    })
+        expect(resp.statusCode).toEqual(401);
+    });
 
     test("not found if student not found", async function(){
         const resp = await request(app)
             .get("/students/1/unread")
-            .set("authorization", `Bearer ${u1Token}`)
+            .set("authorization", `Bearer ${u1Token}`);
 
-        expect(resp.statusCode).toEqual(404)
-    })
+        expect(resp.statusCode).toEqual(404);
+    });
 })

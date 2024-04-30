@@ -13,6 +13,7 @@ const {
     u1Token,
     u2Token,
     adminToken,
+    masterToken,
     } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -29,7 +30,7 @@ describe("POST /users/", function() {
                 first_name: "test",
                 last_name: "last",
                 password: "pass",
-                is_admin: true
+                role: "user"
             })
             .set("authorization", `Bearer ${adminToken}`);
         
@@ -39,10 +40,47 @@ describe("POST /users/", function() {
                 id: 20001,
                 first_name: "test",
                 last_name: "last",
-                is_admin: true
-            },
-            token: expect.any(String)
+                role: "user"
+            }
         });
+    });
+
+    test("Works for creating 'Master'", async function(){
+        const resp = await request(app)
+            .post("/users")
+            .send({
+                id: 20001,
+                first_name: "test",
+                last_name: "last",
+                password: "pass",
+                role: "master"
+            })
+        .set("authorization", `Bearer ${masterToken}`);
+
+        expect(resp.statusCode).toEqual(201);
+        expect(resp.body).toEqual({
+            user: {
+                id: 20001,
+                first_name: "test",
+                last_name: "last",
+                role: "master"
+            }
+        });
+    });
+
+    test("unauth for creating 'master' without 'master' permissions", async function() {
+        const resp = await request(app)
+            .post("/users")
+            .send({
+                id: 20001,
+                first_name: "test",
+                last_name: "last",
+                password: "pass",
+                role: "master"
+            })
+            .set("authorization", `Bearer ${adminToken}`);
+
+        expect(resp.statusCode).toEqual(401);
     });
 
     test("unauth for users", async function(){
@@ -53,7 +91,7 @@ describe("POST /users/", function() {
                 first_name: "test",
                 last_name: "last",
                 password: "pass",
-                is_admin: true
+                role: "user"
             })
             .set("authorization", `Bearer ${u1Token}`);
         
@@ -68,7 +106,7 @@ describe("POST /users/", function() {
                 first_name: "test",
                 last_name: "last",
                 password: "pass",
-                is_admin: true
+                role: "user"
             });
         
         expect(resp.statusCode).toEqual(401);
@@ -81,7 +119,7 @@ describe("POST /users/", function() {
                 first_name: "test",
                 last_name: "last",
                 password: "pass",
-                is_admin: true
+                role: "user"
             })
             .set("authorization", `Bearer ${adminToken}`);
 
@@ -96,7 +134,7 @@ describe("POST /users/", function() {
                 first_name: "test",
                 last_name: "last",
                 password: "pass",
-                is_admin: true
+                role: "user"
             })
             .set("authorization", `Bearer ${adminToken}`);
 
@@ -115,17 +153,17 @@ describe("GET /users/", function() {
                 {id: 10001,
                 first_name:'test', 
                 last_name: 'user', 
-                is_admin: false},
+                role: "user"},
                 
                 {id: 10002, 
                 first_name: 'test', 
                 last_name: 'user2',
-                is_admin: false},
+                role: "user"},
                 
                 {id: 10003, 
                 first_name: 'admin', 
                 last_name: 'user',
-                is_admin: true}]
+                role: "school_admin"}]
             });
     });
 
