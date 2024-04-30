@@ -21,7 +21,7 @@ const router = new express.Router();
 router.get("/", ensureAdmin, async function(req, res, next){
     try{
         const classes = await Class.getAll();
-        req.return({ classes });
+        return res.json({ classes });
     } catch(e){
         return next(e)
     }
@@ -38,7 +38,7 @@ router.get("/", ensureAdmin, async function(req, res, next){
 router.post("/new", ensureAdmin, async function(req, res, next){
     try{
         const newClass = await Class.create(data.name, data.schoolId);
-        req.return({ newClass })
+        return res.status(201).json({ newClass })
     } catch (e) {
         return next(e)
     };
@@ -54,7 +54,7 @@ router.post("/new", ensureAdmin, async function(req, res, next){
 router.get(":/id", ensureLoggedIn, async function (req, res, next) {
     try{
         const classInfo = await Class.get(req.params.id);
-        return classInfo;
+        return res.json({ classInfo });
     } catch(e) {
         return next(e)
     }
@@ -70,7 +70,7 @@ router.get(":/id", ensureLoggedIn, async function (req, res, next) {
 router.patch("/:id", ensureAdmin, async function (req, res, next) {
     try{
         const updatedClass = await Class.patch(req.params.id, req.body.name);
-        req.return({ updatedClass });
+        return res.status(201).json({ updatedClass });
     } catch (e) {
         return next(e);
     };
@@ -85,7 +85,7 @@ router.patch("/:id", ensureAdmin, async function (req, res, next) {
 router.delete("/:id", ensureAdmin, async function(req, res, next) {
     try{
         const deletedClass = await Class.remove(req.params.id);
-        req.return({ deletedClass });
+        return res.json({ deletedClass });
     } catch(e) {
         return next(e);
     }

@@ -17,7 +17,7 @@ const router = new express.Router();
 router.get("/:id", ensureLoggedIn, async function (req, res, next){
     try{
         const allSets = await BookSet.getAll(req.params.id);
-        req.return({ allSets });
+        return res.json({ allSets });
     } catch(e) {
         return next(e);
     }
@@ -32,14 +32,14 @@ router.post("/new", ensureAdmin, async function(req, res, next) {
     if(req.body.stage){
         try{
             const newSet = await BookSet.create(req.body.schoolId, req.body.stage);
-            req.return({ newSet });
+            return res.status(201).json({ newSet });
         } catch(e) {
             return next(e);
         }
     } else{
         try{
             const newSet = await BookSet.create(req.body.schoolId);
-            req.return({ newSet });
+            return res.status(201).json({ newSet });
         } catch(e) {
             return next(e);
         }
@@ -55,7 +55,7 @@ router.post("/new", ensureAdmin, async function(req, res, next) {
 router.patch("/:id", ensureAdmin, async function (req, res, next) {
     try{
         const patchSet = await BookSet.patch(req.body.schoolId, req.params.id);
-        req.return({ patchSet });
+        return res.json({ patchSet });
     } catch(e) {
         return next(e);
     }
@@ -69,7 +69,7 @@ router.patch("/:id", ensureAdmin, async function (req, res, next) {
 router.delete("/:id", ensureAdmin, async function (req, res, next) {
     try{
         const deleteSet = await BookSet.delete(req.params.id);
-        req.return({ deleteSet });
+        return res.json({ deleteSet });
     } catch(e){
         return next(e)
     }

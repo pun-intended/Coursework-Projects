@@ -14,10 +14,15 @@ const Student = require("../models/student");
 
 const router = new express.Router();
 
+/** POST / {student_data} => {id, first_name, last_name, class_id}
+ * 
+ * {student_data} should be {first_name, last_name, class_id}
+ * 
+ */
 router.post("/", ensureAdmin, async function (req, res, next) {
     try{
         const newStudent = await Student.create(req.body);
-        req.return({ newStudent });
+        return res.status(201).json({ newStudent });
     }catch(e){
         return next(e);
     }
@@ -27,10 +32,10 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  * 
  * Returns {id, first_name, last_name, level} for all students
  * 
- * Auth: login
+ * Auth: schoolAdmin
  */
 // TODO - Refine search to school/class
-router.get("/", ensureLoggedIn, async function (req, res, next) {
+router.get("/", ensureAdmin, async function (req, res, next) {
     try{
         const students = await Student.getAllStudents();
         return res.json({students});
@@ -38,6 +43,7 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
         return next(e);
     }
 })
+
 
 /** GET /[id] => {id, first_name, last_name, level}
  * 
@@ -63,8 +69,6 @@ router.get("/:id", ensureLoggedIn, async function (req, res, next) {
  */
 router.get("/:id/unread", ensureLoggedIn, async function (req, res, next) {
     try{
-        // fail fast if no student
-        const student = await Student.getStudent(req.params.id);
         const unread = await Student.getUnreadBooks(req.params.id);
         return res.json({unread});
     }catch(e){
