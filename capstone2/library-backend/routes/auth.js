@@ -27,8 +27,6 @@ const router = new express.Router();
 router.post("/register", async function(req, res, next){
     
     try{
-        // QUESTION - changed id data type to string.  Is there a better way to handle integer type fields in data validation? All come packaged as string
-        // JSON.parse?
         const validator = jsonschema.validate(req.body, authRegisterSchema)
         if(!validator.valid){
             const errs = validator.errors.map(e => e.stack)
