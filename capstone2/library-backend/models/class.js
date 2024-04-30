@@ -9,6 +9,17 @@ const { sqlForPartialUpdate } = require('../helpers/sql');
 // ----- After completion
 class Class {
 
+    // Get Class
+    static async get(id){
+        const classInfo = await db.query(
+            `SELECT id, name, school
+            FROM classes
+            WHERE id = $1`,
+            [id]
+        );
+        return classInfo.rows;
+    }
+
     // get all classes
     static async getAll(){
         const allClasses = await db.query(
