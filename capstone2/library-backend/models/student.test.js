@@ -42,7 +42,9 @@ describe("getAllStudents", function(){
             first_name: 'Caspar', 
             last_name: 'Stedson', 
             class_id: "1006",
+            school_id: "102",
             title: "Max Has a Fish",
+            has_read: ['679884645','375821791','375831150'],
             isbn: "448461587",
             book_id: 104,
             borrow_date: "2023-10-24"
