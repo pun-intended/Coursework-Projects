@@ -4,7 +4,7 @@
 const jsonschema = require("jsonschema");
 const express = require("express");
 
-const { BadRequestError } = require("../expressError");
+const { BadRequestError, UnauthorizedError } = require("../expressError");
 const { ensureAdmin, ensureCorrectUserOrAdmin, ensureLoggedIn } = require("../middleware/auth");
 const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
@@ -16,24 +16,25 @@ const router = new express.Router();
 
 /** POST / {user} => {user, token}
  * 
- * user should be {id, first_name, last_name, password, is_admin}
+ * user should be {id, first_name, last_name, password, role}
  * 
  * Returns JWT for user
  * 
  * Auth: Admin
  */
 router.post("/create", ensureAdmin, async function (req, res, next) {
-    // Add Validation
-    
     try{
         const validator = jsonschema.validate(req.body, userCreateSchema)
+        
+        if(req.body.role === "master" && (!res.locals.user.role === "master")){
+            throw new UnauthorizedError();
+        }
         if(!validator.valid){
             const errs = validator.errors.map(e => e.stack)
             throw new BadRequestError(errs)
         }
         const user = await User.create(req.body)
-        const token = createToken(user)
-        return res.status(201).json({ user, token })
+        return res.status(201).json({ user })
     }catch(e){
         return next(e)
     }
@@ -41,9 +42,9 @@ router.post("/create", ensureAdmin, async function (req, res, next) {
 
 /** GET / => {users: [{user}...]}
  * 
- * user is {id, first_name, last_name, is_admin}
+ * user is {id, first_name, last_name, role}
  * 
- * Auth: Admin
+ * Auth: School Admin
  */
 router.get("/", ensureAdmin, async function (req, res, next) {
     try{
@@ -56,7 +57,7 @@ router.get("/", ensureAdmin, async function (req, res, next) {
 
 /** GET /[id] => {user}
  * 
- * user is {id, first_name, last_name, is_admin}
+ * user is {id, first_name, last_name, role}
  * 
  * Auth: Admin, or same user
  */
@@ -73,9 +74,9 @@ router.get("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
  * 
  * data can include {first_name, last_name, password}
  * 
- * Returns {updated: {id, first_name, last_name, is_admin}}
+ * Returns {updated: {id, first_name, last_name, role}}
  * 
- * Auth: Admin or same user
+ * Auth: School Admin or same user
  */
 // QUESTION - Best way to prevent someone from changing admins status while allowing admin change
 router.patch("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
@@ -97,9 +98,9 @@ router.patch("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
  * 
  * Delete user
  * 
- * Auth: Admin or same user
+ * Auth: School Admin
  */
-router.delete("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
+router.delete("/:id", ensureAdmin, async function (req, res, next) {
     try{
         const deleted = await User.remove(req.params.id);
         return res.json({deleted})
