@@ -27,31 +27,32 @@ router.get("/", ensureAdmin, async function(req, res, next){
     }
 })
 
-
-/** POST /new {data} => {class_id, name, school_id}
+/** POST /new {data} => {id, name, school_id}
  * 
  * Create a new class with the provided name and school id
- * returns the class_id, name and school name
+ * returns the id, name and school_id
  * 
  * Auth: Admin
  */
 router.post("/new", ensureAdmin, async function(req, res, next){
     try{
+        const data = req.body;
         const newClass = await Class.create(data.name, data.schoolId);
         return res.status(201).json({ newClass })
     } catch (e) {
+        console.log(e)
         return next(e)
     };
 });
 
-/** GET /id => {class_id, name, school_id}
+/** GET /id => {id, name, school_id}
  * 
  * Get id, name, and school id of a given class
  * 
  * Auth: Login
  */
 
-router.get(":/id", ensureLoggedIn, async function (req, res, next) {
+router.get("/:id", ensureLoggedIn, async function (req, res, next) {
     try{
         const classInfo = await Class.get(req.params.id);
         return res.json({ classInfo });
@@ -60,10 +61,10 @@ router.get(":/id", ensureLoggedIn, async function (req, res, next) {
     }
 })
 
-/** PATCH /id {name} => {class_id, name, school_id}
+/** PATCH /id {name} => {id, name, school_id}
  * 
  * Change the name of a class
- * returns class_id, name, school_id
+ * returns id, name, school_id
  * 
  * Auth: Admin
  */

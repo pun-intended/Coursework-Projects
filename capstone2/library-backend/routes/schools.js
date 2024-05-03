@@ -9,13 +9,16 @@ const { BadRequestError } = require("../expressError");
 const { ensureMaster, ensureAdmin, ensureLoggedIn } = require("../middleware/auth");
 const Class = require("../models/school");
 const School = require("../models/school");
+const BookSet = require("../models/bookSet");
 
 const router = new express.Router();
 
-/** GET
- * get all schools
+/** GET / => {schools: {id, name}}
+ * get data for all schools
+ * 
+ * Auth: login
  */
-router.get("/", ensureAdmin, async function (req, res, next){
+router.get("/", ensureLoggedIn, async function (req, res, next){
     try{
         const schools = await School.getAll();
         return res.json({ schools });
@@ -24,9 +27,23 @@ router.get("/", ensureAdmin, async function (req, res, next){
     }
 })
 
-/** GET /:id/students => {students: [{id, first_name, last_name, level}]}
+/** GET /id => {school_data}
+ * Return data on single school
  * 
- * Returns {id, first_name, last_name, level} for all students at
+ * Auth: login
+ */
+router.get("/:id", ensureLoggedIn, async function(req, res, next){
+    try{
+        const school = await School.get(req.params.id);
+        return res.json({ school });
+    } catch(e) {
+        return next(e);
+    }
+});
+
+/** GET /:id/students => {students: [{id, first_name, last_name, class_id}]}
+ * 
+ * Returns {id, first_name, last_name, class_id} for all students at
  * school with parameter ID
  * 
  * Auth: login
@@ -40,22 +57,43 @@ router.get("/:id/students", ensureLoggedIn, async function (req, res, next) {
     }
 })
 
-/** GET /id => {school_data}
- * Return data on single school
+/** GET /:id/classes => {classes: [{id, name, school_id}]}
  * 
+ * Returns {id, name, school_id} for all classes at
+ * school with parameter ID
  * 
+ * Auth: login
  */
-router.get("/:id", ensureLoggedIn, async function(req, res, next){
+router.get("/:id/classes", ensureLoggedIn, async function (req, res, next) {
     try{
-        const school = await School.get(req.params.id);
-        return res.json({ school });
-    } catch(e) {
+        const classes = await Class.getAll(req.params.id);
+        return res.json({classes});
+    }catch(e){
         return next(e);
     }
-});
+})
 
-/** POST
+/** GET /:id/books => {books: [{id, name, school_id}]}
+ * 
+ * Returns {id, name, school_id} for all classes at
+ * school with parameter ID
+ * 
+ * Auth: login
+ */
+router.get("/:id/books", ensureLoggedIn, async function (req, res, next) {
+    try{
+        const books = await BookSet.getAll(req.params.id);
+        return res.json({books});
+    }catch(e){
+        return next(e);
+    }
+})
+
+/** POST /new {name} => {id, name}
+ * 
  * create a new school
+ * 
+ * Auth: master
  */
 router.post("/new", ensureMaster, async function (req, res, next){
     try{
@@ -66,8 +104,11 @@ router.post("/new", ensureMaster, async function (req, res, next){
     }
 })
 
-/** PATCH
+/** PATCH /:id {name} => {id, name}
+ * 
  * Edit school name
+ * 
+ * Auth: master
  */
 router.patch("/:id", ensureMaster, async function (req, res, next){
     try{
@@ -78,8 +119,11 @@ router.patch("/:id", ensureMaster, async function (req, res, next){
     }
 })
 
-/** DELETE
+/** DELETE /:id => {id}
+ * 
  * remove a school
+ * 
+ * Auth: master
  */
 router.delete("/:id", ensureMaster, async function (req, res, next){
     try{

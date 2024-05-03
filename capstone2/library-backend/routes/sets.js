@@ -5,23 +5,9 @@ const express = require("express");
 
 const { BadRequestError } = require("../expressError");
 const { ensureLoggedIn, ensureMaster, ensureAdmin } = require("../middleware/auth");
-const BookSet = require("../models/bookSets");
+const BookSet = require("../models/bookSet");
 
 const router = new express.Router();
-
-/** GET /id => {sets: {set}...}
- * get all sets for a given school
- * 
- * Auth: Login
- */
-router.get("/:id", ensureLoggedIn, async function (req, res, next){
-    try{
-        const allSets = await BookSet.getAll(req.params.id);
-        return res.json({ allSets });
-    } catch(e) {
-        return next(e);
-    }
-})
 
 /** POST /new {schoolId} => {set}
  * Add book set
@@ -61,7 +47,7 @@ router.patch("/:id", ensureAdmin, async function (req, res, next) {
     }
 })
 
-/** DELETE /id => {setId}
+/** DELETE /id => {id}
  * Delete a given set Id
  * 
  * Auth: Admin
