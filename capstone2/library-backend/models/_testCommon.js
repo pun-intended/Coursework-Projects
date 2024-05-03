@@ -8,7 +8,6 @@ const { createToken } = require("../helpers/tokens");
 
 async function commonBeforeAll() {
 
-
     await db.query(
       `DELETE FROM users`
     )
@@ -22,11 +21,27 @@ async function commonBeforeAll() {
     )
 
     await db.query(
+      `DELETE FROM book_sets`
+    )
+
+    await db.query(
+      `DELETE FROM master_books`
+    )
+
+    await db.query(
+      `DELETE FROM schools`
+    )
+    
+    await db.query(
+      `DELETE FROM classes`
+    )
+
+    await db.query(
       `DELETE FROM borrow_record`
     )
 
     await db.query(`
-    INSERT INTO users (id, first_name, last_name, password, is_admin) 
+    INSERT INTO users (id, first_name, last_name, password, role) 
     VALUES 
       ('10001', 'user', 'name', 
       '$2a$12$OnF1/U4/4QB4ccWdS5R4b.RLfGptno1kP4rGt8pPdAN24p8TULRnS', 'user'),
@@ -59,7 +74,7 @@ async function commonBeforeAll() {
     );
 
     await db.query(
-    `INSERT INTO students (id, first_name, last_name, level)
+    `INSERT INTO students (id, first_name, last_name, class_id)
     VALUES 
       (1001, 'Caspar', 'Stedson', 1006),
       (1002, 'Kira', 'Gashion', 1007),
@@ -110,7 +125,7 @@ async function commonBeforeAll() {
       ('108', '448463768', '1'),
       ('109', '0448461803', '1'),
       ('110', '448464713', '1'),
-      ('112', '448467194', '1'),
+      ('111', '448467194', '1'),
       ('121', '014130670X', '2'),
       ('122', '448457636', '2'),
       ('123', '448461579', '2'),
@@ -145,13 +160,24 @@ async function commonBeforeAll() {
       ('1005', '102', '2023-10-19', NULL),
       ('1007', '124', '2023-10-19', NULL),
       ('1004', '111', '2023-10-18', NULL),
-      ('1006', '102', '2023-10-17', NULL)`
+      ('1006', '105', '2023-10-17', NULL)`
+    );
+
+    await db.query(
+      `SELECT setval(pg_get_serial_sequence('books', 'id'),
+      (SELECT MAX(id) FROM books) + 1)`
+    );
+
+    await db.query(
+      `SELECT setval(pg_get_serial_sequence('users', 'id'),
+      (SELECT MAX(id) FROM users) + 1)`
     );
 }
     
 
 async function commonBeforeEach() {
     await db.query("BEGIN");
+    
 }
   
   async function commonAfterEach() {
@@ -165,7 +191,7 @@ async function commonBeforeEach() {
 const u1Token = createToken({ id: "10001", role: 'user' });
 const u2Token = createToken({ id: "10002", role: 'user' });
 const adminToken = createToken({ id: "10003", role: 'school_admin' });
-const masterToken = createToken({ id: "10004", role: 'master' });
+const masterToken = createToken({ id: "10004", role: 'master_admin' });
 
 
 module.exports = {
