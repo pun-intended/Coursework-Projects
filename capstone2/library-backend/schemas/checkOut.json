@@ -11,14 +11,14 @@
     ],
     "properties": {
         "book_id": {
-            "type": "string",
+            "type": "integer",
             "title": "The book_id Schema",
             "examples": [
                 101
             ]
         },
         "student_id": {
-            "type": "string",
+            "type": "integer",
             "title": "The student_id Schema",
             "examples": [
                 1001

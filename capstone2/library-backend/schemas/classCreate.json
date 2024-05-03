@@ -3,30 +3,32 @@
     "$id": "http://example.com/example.json",
     "type": "object",
     "default": {},
-    "title": "/auth/token Schema",
+    "title": "/auth/register Schema",
     "required": [
-        "id",
-        "password"
+        "school_id",
+        "name"
     ],
     "properties": {
-        "id": {
+        "school_id": {
             "type": "integer",
             "title": "ID",
             "examples": [
                 10001
             ]
         },
-        "password": {
+        "name": {
             "type": "string",
-            "title": "password",
+            "title": "first_name",
             "examples": [
-                "password"
+                "john"
             ]
         }
     },
     "additionalProperties": false,
     "examples": [{
-        "id": "10001",
+        "id": 10001,
+        "first_name": "john",
+        "last_name": "smith",
         "password": "password"
     }]
 }

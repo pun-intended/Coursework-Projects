@@ -11,7 +11,7 @@
     ],
     "properties": {
         "book_id": {
-            "type": "string",
+            "type": "integer",
             "title": "The book_id Schema",
             "examples": [
                 101
@@ -28,7 +28,7 @@
             "type": "string",
             "title": "The condition Schema",
             "examples": [
-                "10-24-2023"
+                "Great"
             ]
         }
     },
