@@ -4,11 +4,13 @@ const db = require('../db.js');
 const Student = require("../models/student.js")
 const { NotFoundError } = require('../expressError.js');
 const {
+    commonBeforeAll,
     commonBeforeEach,
     commonAfterEach,
     commonAfterAll
  } = require('./_testCommon.js');
 
+beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
@@ -26,7 +28,7 @@ describe("create", function() {
         expect(student).toEqual({
             first_name: "test",
             last_name: "student",
-            class_id: "1002",
+            class_id: 1002,
             id: expect.any(Number)
         });
     });
@@ -36,15 +38,15 @@ describe("getAllStudents", function(){
     test("works", async function(){
         let students = await Student.getAllStudents();
 
-        expect(students.length).toEqual(6)
+        expect(students.length).toEqual(10)
         expect(students[0]).toEqual({
             id: 1001, 
             first_name: 'Caspar', 
             last_name: 'Stedson', 
-            class_id: "1006",
-            school_id: "102",
+            class_id: 1006,
+            school_id: 102,
             title: "Max Has a Fish",
-            has_read: ['679884645','375821791','375831150'],
+            has_read: ['448457636','448461579','448461587'],
             isbn: "448461587",
             book_id: 104,
             borrow_date: "2023-10-24"
@@ -60,7 +62,7 @@ describe("getStudent", function(){
             id: 1001, 
             first_name: 'Caspar', 
             last_name: 'Stedson', 
-            class_id: "1006"
+            class_id: 1006
         });
     });
 
@@ -76,15 +78,13 @@ describe("getStudent", function(){
 
 describe("getUnread", function(){
     test("works", async function(){
-        let unread = await Student.getUnreadBooks(1001);
+        let unread = await Student.getUnreadBooks(1001, 102);
 
-        expect(unread.length).toBe(6)
+        expect(unread.length).toBe(8)
         expect(unread[0]).toEqual({
-            id: 101, 
             isbn: '014130670X', 
             title: 'Turtle and Snake Go Camping', 
             stage: 1, 
-            condition: 'Great',
             available: true
         });
     });

@@ -5,11 +5,13 @@ const User = require("../models/user")
 
 const {BadRequestError, NotFoundError, UnauthorizedError } = require('../expressError.js');
 const {
+    commonBeforeAll,
     commonBeforeEach,
     commonAfterEach,
     commonAfterAll
  } = require('./_testCommon.js');
 
+beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
@@ -33,12 +35,14 @@ describe("create", function(){
             id: 1, 
             first_name: "test", 
             last_name: "user", 
-            role: "user"
+            role: "user",
+            class_id: null,
+            school_id: null
         });
 
         const found = await db.query("SELECT * FROM users WHERE id = 1");
         expect(found.rows.length).toEqual(1);
-        expect(found.rows[0].is_admin).toEqual(false);
+        expect(found.rows[0].role).toEqual('user');
         expect(found.rows[0].password.startsWith("$2b$")).toEqual(true);
     });
 
@@ -69,7 +73,9 @@ describe("getUser", function(){
             id: 10001, 
             first_name: "user", 
             last_name: "name", 
-            role: "user"
+            role: "user",
+            class_id: null,
+            school_id: null
         });
     });
 
@@ -92,7 +98,9 @@ describe("getAll", function(){
             id: 10001, 
             first_name: "user", 
             last_name: "name", 
-            role: "user"
+            role: "user",
+            class_id: null,
+            school_id: null
         });
     });
 });
@@ -128,6 +136,8 @@ describe("updateUser", function(){
 
         expect(updatedData).toEqual({
             id: 10001,
+            class_id: null,
+            school_id: null,
             ...newData
         });
     });
@@ -140,7 +150,9 @@ describe("updateUser", function(){
             id: 10001,
             first_name: "user",
             last_name: "name",
-            role: "user"
+            role: "user",
+            class_id: null,
+            school_id: null
           });
           const found = await db.query("SELECT * FROM users WHERE id = 10001");
           expect(found.rows.length).toEqual(1);
@@ -169,7 +181,9 @@ describe("authenticate", function(){
             id: 10001,
             first_name: "user",
             last_name: "name",
-            role: "user"
+            role: "user",
+            class_id: null,
+            school_id: null
         });
     });
 

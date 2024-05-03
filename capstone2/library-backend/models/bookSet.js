@@ -1,23 +1,29 @@
 "use strict"
 const { NotFoundError } = require('../expressError.js')
 
-const db = require('../db')
+const db = require('../db.js')
 
 class BookSet {
     
     /**
-     * Get all books sets in a given school
+     * Get all books sets
+     * takes school id as optional parameter
      * 
      */
-    static async getAll(schoolId){
-        const allSets = await db.query(
-            `SELECT isbn, set_id, title, stage
-            FROM books 
-            JOIN book_sets ON book.set_id = book_sets.set_id
-            WHERE school_id = $1
-            `,
-            [schoolId]
-        )
+    static async getAll(schoolId = null){
+        let queryString = 
+            `SELECT B.isbn, B.set_id, M.title, M.stage
+            FROM books B
+            JOIN book_sets sets ON B.set_id = sets.set_id
+            JOIN master_books M on B.isbn = M.isbn`
+        
+        if(schoolId){
+            queryString += ` WHERE sets.school_id = $1`
+        }
+
+        const sets = await db.query(queryString, [schoolId])
+
+        return sets.rows
     }
     
     /**
@@ -32,7 +38,7 @@ class BookSet {
             [schoolId]
         );
 
-        const setId = newSet.rows[0];
+        const setId = newSet.rows[0].set_id;
         
         if(!stage){
         const newBookSet = await db.query(
@@ -71,7 +77,7 @@ class BookSet {
             [schoolId, setId]
         );
         
-        if(!patchedSet.rows[0]) throw NotFoundError(`No set found with ID ${setId}`);
+        if(!patchedSet.rows[0]) throw new NotFoundError(`No set found with ID ${setId}`);
 
         return patchedSet.rows[0];
     }
@@ -90,9 +96,9 @@ class BookSet {
             [setId]
         );
 
-        if (!deleteSet.rows[0]) throw NotFoundError(`No set found with ID ${setId}`)
+        if (!deleteSet.rows[0]) throw new NotFoundError(`No set found with ID ${setId}`)
 
-        return deleteSet.row[0];
+        return deleteSet.rows[0];
     }
 
 }

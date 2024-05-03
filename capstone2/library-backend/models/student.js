@@ -63,7 +63,8 @@ class Student {
             JOIN master_books M ON M.isbn = B.isbn
             JOIN borrow_record AS rec ON B.id = rec.book_id
             WHERE return_date IS NULL) AS q2 
-        ON s.id = q2.student_id`)
+        ON s.id = q2.student_id
+        ORDER BY S.id`)
         
         return students.rows;
     }

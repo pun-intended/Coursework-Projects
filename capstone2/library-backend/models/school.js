@@ -10,7 +10,7 @@ class School {
 
     // get all schools
     static async getAll(){
-        const allSchools = db.query(
+        const allSchools = await db.query(
             `SELECT id, name
             FROM schools`
         );
@@ -19,7 +19,7 @@ class School {
 
     // Get school by ID
     static async get(id){
-        const school = db.query(
+        const school = await db.query(
             ` SELECT id, name
             FROM schools
             WHERE id = $1`,
@@ -29,8 +29,8 @@ class School {
     }
     // Add school
     static async create(name){
-        const newSchool = db.query(
-            `INSERT INTO schools
+        const newSchool = await db.query(
+            `INSERT INTO schools (name)
             VALUES($1)
             RETURNING id`,
             [name]
@@ -41,9 +41,9 @@ class School {
 
     // Edit school details
     static async patch(schoolId, name){
-        const updateSchool = db.query(
+        const updateSchool = await db.query(
             `UPDATE schools
-            SET (name = $1)
+            SET name = $1
             WHERE id = $2
             RETURNING id, name`,
             [name, schoolId]
@@ -56,7 +56,7 @@ class School {
 
     // Delete school
     static async remove(schoolId){
-        const deletedSchool = db.query(
+        const deletedSchool = await db.query(
             `DELETE FROM schools
             WHERE id = $1
             RETURNING id`,

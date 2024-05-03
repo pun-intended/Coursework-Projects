@@ -54,13 +54,27 @@ class Book {
     static async checkIn(data){
         const res = await db.query(
             `UPDATE borrow_record
-            SET return_date = $1, condition = $2
-            WHERE book_id = $3 AND return_date IS NULL
+                SET return_date = $1
+            WHERE book_id = $2 AND return_date IS NULL
             RETURNING id, return_date
             `,
-            [data.date, data.condition, data.book_id]
-        )
-        const checkIn = res.rows[0]
+            [data.date, data.book_id]
+        );
+        
+        const checkIn = res.rows[0];
+        if (!checkIn) {
+            throw new NotFoundError(`No outstanding record found for book id ${data.book_id}`)
+        }
+
+        const condition = await db.query(
+            `UPDATE books
+                SET condition = $1
+            WHERE id = $2
+            RETURNING condition`,
+            [data.condition, data.book_id]
+        );
+        
+        checkIn['condition'] = condition.rows[0].condition;
 
         if (!checkIn) {
             throw new NotFoundError(`No outstanding record found for book id ${data.book_id}`)
@@ -122,6 +136,7 @@ class Book {
     static async getAllBooks(school_id, stage = null){
 
         // Will the available field cause false positives when a book is taken out a second time? Limit IDs to null return dates?
+        let books;
         const baseQuery = 
             `SELECT isbn,
             title,
@@ -132,9 +147,13 @@ class Book {
                     WHERE (rec.return_date IS NOT NULL OR rec.borrow_date IS NULL) AND set.school_id = $1) AS available
             FROM master_books`
         
-        const stageFilter = stage ? ` WHERE stage = ${stage}`: ""
+        if(stage){
+            baseQuery += ` WHERE stage = $2`
+            books = await db.query(baseQuery, [school_id, stage])
+        } else {
+            books = await db.query(baseQuery, [school_id])
+        }
 
-        const books = await db.query(baseQuery.concat(stageFilter), [school_id])
         return books.rows
     }
 
@@ -209,7 +228,7 @@ class Book {
         const deleted = book.rows[0];
         
         if(!book) throw new NotFoundError(`No book found with ID: ${book_id}`)
-        return book
+        return deleted
     }
 }
 
