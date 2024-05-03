@@ -51,7 +51,8 @@ function ensureLoggedIn(req, res, next) {
 function ensureAdmin(req, res, next) {
   try {
     const user = res.locals.user;
-    const isAdmin = (user.role === 'master' || user.role === 'school')
+
+    const isAdmin = (user && (user.role === 'master_admin' || user.role === 'school_admin'));
 
     if (!user || !isAdmin) {
       throw new UnauthorizedError();
@@ -69,10 +70,12 @@ function ensureAdmin(req, res, next) {
 
 function ensureMaster(req, res, next) {
   try {
-    if (!res.locals.user || !res.locals.user.role === 'master') {
-      throw new UnauthorizedError();
+    const user = res.locals.user
+    if (user && user.role === 'master_admin') {
+      return next();
     }
-    return next();
+    throw new UnauthorizedError();
+    
   } catch (err) {
     return next(err);
   }
@@ -87,7 +90,9 @@ function ensureMaster(req, res, next) {
 function ensureCorrectUserOrAdmin(req, res, next) {
   try {
     const user = res.locals.user;
-    const isAdmin = (user.role === 'master' || user.role === 'school')
+    if(!user) throw new UnauthorizedError();
+    
+    const isAdmin = (user.role === 'master_admin' || user.role === 'school_admin')
     if (!(user && (isAdmin || user.id == req.params.id))) {
       throw new UnauthorizedError();
     }

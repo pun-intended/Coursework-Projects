@@ -83,25 +83,25 @@ describe("ensureLoggedIn", function () {
 });
 
 
-describe("ensureSchoolAdmin", function () {
+describe("ensureAdmin", function () {
   test("works", function () {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { id: 10001, role: 'school' } } };
+    const res = { locals: { user: { id: 10001, role: 'school_admin' } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
-    ensureSchoolAdmin(req, res, next);
+    ensureAdmin(req, res, next);
   });
   
-  test("works ith master role", function () {
+  test("works with master role", function () {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { id: 10001, role: 'master' } } };
+    const res = { locals: { user: { id: 10001, role: 'master_admin' } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
-    ensureSchoolAdmin(req, res, next);
+    ensureAdmin(req, res, next);
   });
 
   test("unauth if not admin", function () {
@@ -111,7 +111,7 @@ describe("ensureSchoolAdmin", function () {
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };
-    ensureSchoolAdmin(req, res, next);
+    ensureAdmin(req, res, next);
   });
 
   test("unauth if anon", function () {
@@ -121,7 +121,7 @@ describe("ensureSchoolAdmin", function () {
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };
-    ensureSchoolAdmin(req, res, next);
+    ensureAdmin(req, res, next);
   });
 });
 
@@ -129,28 +129,29 @@ describe("ensureMaster", function () {
   test("works", function () {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { id: 10001, role: 'school' } } };
-    const next = function (err) {
-      expect(err).toBeFalsy();
-    };
-    ensureMaster(req, res, next);
-  });
-  
-  test("works ith master role", function () {
-    expect.assertions(1);
-    const req = {};
-    const res = { locals: { user: { id: 10001, role: 'master' } } };
+    const res = { locals: { user: { id: 10001, role: 'master_admin' } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
     ensureMaster(req, res, next);
   });
 
-  test("unauth if not admin", function () {
+  test("unauth for school_admin", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: { user: { id: 10001, role: 'school_admin' } } };
+    const next = function (err) {
+      expect(err instanceof UnauthorizedError).toBeTruthy();
+    };
+    ensureMaster(req, res, next);
+  });
+
+  test("unauth for user", function () {
     expect.assertions(1);
     const req = {};
     const res = { locals: { user: { id: 10001, role: 'user' } } };
     const next = function (err) {
+      console.log(err)
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };
     ensureMaster(req, res, next);
@@ -172,34 +173,34 @@ describe("ensureCorrectUserOrAdmin", function () {
   test("works: admin", function () {
     expect.assertions(1);
     const req = { params: { id: 10002 } };
-    const res = { locals: { user: { id: 10003, is_admin: true } } };
+    const res = { locals: { user: { id: 10003, role: 'school_admin' } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
     ensureCorrectUserOrAdmin(req, res, next);
   });
 
-  test("works: same user", function () {
+  test("works - same user", function () {
     expect.assertions(1);
     const req = { params: { id: 10002 } };
-    const res = { locals: { user: { id: 10002, is_admin: false } } };
+    const res = { locals: { user: { id: 10002, role: 'user'  } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
     ensureCorrectUserOrAdmin(req, res, next);
   });
 
-  test("unauth: mismatch", function () {
+  test("unauth for mismatched user id", function () {
     expect.assertions(1);
     const req = { params: { id: 10001 } };
-    const res = { locals: { user: { id: 10003, is_admin: false } } };
+    const res = { locals: { user: { id: 10003, role: 'user'  } } };
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };
     ensureCorrectUserOrAdmin(req, res, next);
   });
 
-  test("unauth: if anon", function () {
+  test("unauth if anon", function () {
     expect.assertions(1);
     const req = { params: { id: 10002 } };
     const res = { locals: {} };
