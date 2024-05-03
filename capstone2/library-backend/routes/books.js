@@ -136,7 +136,7 @@ router.delete("/:id", ensureAdmin, async function (req, res, next) {
  * 
  * Auth: login
  */
-router.patch("/:id/update", async function (req, res, next) {
+router.patch("/:id/update", ensureLoggedIn, async function (req, res, next) {
     
 })
 module.exports = router;

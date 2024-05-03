@@ -3,7 +3,6 @@
 const request = require("supertest");
 
 const app = require("../app");
-const Book = require("../models/book");
 
 const {
     commonBeforeAll,
@@ -11,10 +10,10 @@ const {
     commonAfterEach,
     commonAfterAll,
     u1Token,
-    u2Token,
-    adminToken,
-    masterToken
+    adminToken
     } = require("./_testCommon");
+const Book = require("../models/book");
+const { NotFoundError } = require("../expressError");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -32,7 +31,7 @@ describe("GET /books/", function() {
         
         const allBooks = resp.body.books;
 
-        expect(allBooks.length).toEqual(22);
+        expect(allBooks.length).toEqual(11);
         expect(allBooks[0]).toEqual({
             isbn: '014130670X', 
             title: 'Turtle and Snake Go Camping', 
@@ -94,17 +93,17 @@ describe("GET /books/outstanding", function() {
 
         const books = resp.body.books
 
-        expect(books.length).toEqual(5);
+        expect(books.length).toEqual(6);
         expect(books[0]).toEqual({
-            book_id: 104, 
-            isbn: '448461587', 
-            title: 'Max Has a Fish', 
+            book_id: 102, 
+            isbn: '448457636', 
+            title: 'Bake, Mice, Bake!', 
             stage: 1, 
             condition: 'Great',
-            student_id: 1001, 
-            first_name: 'Caspar', 
-            last_name: 'Stedson', 
-            borrow_date: '2023-10-24'
+            student_id: 1005, 
+            first_name: 'Terrijo', 
+            last_name: 'Winchester', 
+            borrow_date: '2023-10-19'
             });
     });
 
@@ -211,7 +210,8 @@ describe("POST /books/checkin", function() {
             .post("/books/checkin")
             .send({
                 book_id: 104,
-                date: "12-12-2024"
+                date: "12-12-2024",
+                condition: "Great"
             })
             .set("authorization", `Bearer ${u1Token}`);
 
@@ -219,7 +219,8 @@ describe("POST /books/checkin", function() {
         expect(resp.body).toEqual({
             returned: {
                 id: expect.any(Number),
-                return_date: "12-12-2024"
+                return_date: "12-12-2024",
+                condition: "Great"
             }
         });
     });
@@ -229,7 +230,8 @@ describe("POST /books/checkin", function() {
             .post("/books/checkin")
             .send({
                 book_id: 104,
-                date: "12-12-2024"
+                date: "12-12-2024",
+                condition: "Great"
             });
 
         expect(resp.statusCode).toEqual(401);
@@ -240,14 +242,15 @@ describe("POST /books/checkin", function() {
             .post("/books/checkin")
             .send({
                 book_id: 1,
-                date: "12-12-2024"
+                date: "12-12-2024",
+                condition: "Great"
             })
             .set("authorization", `Bearer ${u1Token}`)
 
         expect(resp.statusCode).toEqual(404);
     });
 
-    test("bad request if invalid data", async function(){
+    test("bad request if missing data", async function(){
         const resp = await request(app)
         .post("/books/checkin")
         .send({
@@ -258,3 +261,40 @@ describe("POST /books/checkin", function() {
     expect(resp.statusCode).toEqual(400)
     });
 });
+
+describe("DELETE /books/:id", function() {
+    test("works", async function(){
+        const resp = await request(app)
+            .delete("/books/101")
+            .set("authorization", `Bearer ${adminToken}`);
+
+        expect(resp.statusCode).toEqual(200);
+        expect(resp.body).toEqual({
+            book: {id: 101}
+        });
+
+        try{
+            const check = await Book.get(101);
+            fail();
+        } catch(e) {
+            expect(e instanceof NotFoundError).toBeTruthy;
+        }
+    });
+
+    test("unauth for users", async function(){
+        const resp = await request(app)
+           .delete("/books/101")
+            .set("authorization", `Bearer ${u1Token}`);
+
+        expect(resp.statusCode).toEqual(401);
+        
+    });
+
+    test("unauth for anon", async function(){
+        const resp = await request(app)
+           .delete("/books/101");
+
+        expect(resp.statusCode).toEqual(401);
+
+    });
+})
