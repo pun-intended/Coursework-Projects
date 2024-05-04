@@ -7,7 +7,7 @@
     "required": [
     ],
     "properties": {
-        "school_id": {
+        "schoolId": {
             "type": "integer",
             "title": "ID",
             "examples": [

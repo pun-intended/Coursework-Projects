@@ -5,11 +5,11 @@
     "default": {},
     "title": "/auth/register Schema",
     "required": [
-        "school_id",
+        "schoolId",
         "name"
     ],
     "properties": {
-        "school_id": {
+        "schoolId": {
             "type": "integer",
             "title": "ID",
             "examples": [

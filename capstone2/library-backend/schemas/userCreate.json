@@ -9,7 +9,7 @@
         "first_name",
         "last_name",
         "password",
-        "is_admin"
+        "role"
     ],
     "properties": {
         "id": {
@@ -40,14 +40,27 @@
                 "password"
             ]
         },
-        "is_admin": {
-            "type": "boolean",
-            "title": "is_admin",
+        "role": {
+            "type": "string",
+            "title": "role",
             "examples": [
-                true
+                "password"
+            ]
+        },
+        "class_id": {
+            "type": "integer",
+            "title": "class ID",
+            "examples": [
+                1001
+            ]
+        },
+        "school_id": {
+            "type": "integer",
+            "title": "school ID",
+            "examples": [
+                101
             ]
         }
-
     },
     "additionalProperties": false,
     "examples": [{

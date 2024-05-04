@@ -34,6 +34,20 @@
             "examples": [
                 "password"
             ]
+        },
+        "class_id": {
+            "type": "integer",
+            "title": "class ID",
+            "examples": [
+                1001
+            ]
+        },
+        "school_id": {
+            "type": "integer",
+            "title": "school ID",
+            "examples": [
+                101
+            ]
         }
     },
     "additionalProperties": false,

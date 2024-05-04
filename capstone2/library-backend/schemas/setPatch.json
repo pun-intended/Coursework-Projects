@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "/set/patch Schema",
+    "required": [
+        "schoolId"
+    ],
+    "properties": {
+        "schoolId": {
+            "type": "integer",
+            "title": "ID",
+            "examples": [
+                10001
+            ]
+        }
+    },
+    "additionalProperties": false,
+    "examples": [{
+        "school_id": 10001
+    }]
+}

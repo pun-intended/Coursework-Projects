@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "/class/patch Schema",
+    "required": [
+        "name"
+    ],
+    "properties": {
+        "name": {
+            "type": "string",
+            "title": "first_name",
+            "examples": [
+                "john"
+            ]
+        }
+    },
+    "additionalProperties": false,
+    "examples": [{
+        "id": 10001,
+        "name": "john"
+    }]
+}
