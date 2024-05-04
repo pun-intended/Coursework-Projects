@@ -80,7 +80,7 @@ describe("POST /sets/new", function(){
     test("fails without school id", async function(){});
 });
 
-describe("PATCH, /sets/:id", function(){
+describe("PATCH /sets/:id", function(){
     test("works", async function(){
         const resp = await request(app)
             .patch("/sets/3")
@@ -90,7 +90,7 @@ describe("PATCH, /sets/:id", function(){
             .set("authorization", `Bearer ${adminToken}`);
 
         expect(resp.statusCode).toEqual(200);
-        expect(resp.body).toEqual({"set_id": 3});
+        expect(resp.body).toEqual({"patchSet": {"set_id": 3}});
     });
 
     test("unauth for user", async function(){
@@ -167,7 +167,7 @@ describe("DELETE /sets/:id", function(){
     test("not found with invalid set_id", async function(){
         const resp = await request(app)
             .delete("/sets/0")
-            .set("authorization", `Bearer ${u1Token}`);
+            .set("authorization", `Bearer ${adminToken}`);
 
         expect(resp.statusCode).toEqual(404);
     })

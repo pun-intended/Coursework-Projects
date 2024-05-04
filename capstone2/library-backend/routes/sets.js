@@ -7,6 +7,9 @@ const { BadRequestError } = require("../expressError");
 const { ensureLoggedIn, ensureMaster, ensureAdmin } = require("../middleware/auth");
 const BookSet = require("../models/bookSet");
 
+const createSchema = require("../schemas/setCreate.json")
+const patchSchema = require("../schemas/setPatch.json")
+
 const router = new express.Router();
 
 /** POST /new {schoolId} => {set}
@@ -15,6 +18,12 @@ const router = new express.Router();
  * Auth: Admin
  */
 router.post("/new", ensureAdmin, async function(req, res, next) {
+    const data = req.body
+    const validator = jsonschema.validate(data, createSchema)
+    if(!validator.valid){
+        const errs = validator.errors.map(e => e.stack)
+        throw new BadRequestError(errs)
+    }
     if(req.body.stage){
         try{
             const newSet = await BookSet.create(req.body.schoolId, req.body.stage);
@@ -40,6 +49,12 @@ router.post("/new", ensureAdmin, async function(req, res, next) {
  */
 router.patch("/:id", ensureAdmin, async function (req, res, next) {
     try{
+        const data = req.body
+        const validator = jsonschema.validate(data, patchSchema)
+        if(!validator.valid){
+            const errs = validator.errors.map(e => e.stack)
+            throw new BadRequestError(errs)
+        }
         const patchSet = await BookSet.patch(req.body.schoolId, req.params.id);
         return res.json({ patchSet });
     } catch(e) {
@@ -54,7 +69,7 @@ router.patch("/:id", ensureAdmin, async function (req, res, next) {
  */
 router.delete("/:id", ensureAdmin, async function (req, res, next) {
     try{
-        const deleteSet = await BookSet.delete(req.params.id);
+        const deleteSet = await BookSet.remove(req.params.id);
         return res.json({ deleteSet });
     } catch(e){
         return next(e)

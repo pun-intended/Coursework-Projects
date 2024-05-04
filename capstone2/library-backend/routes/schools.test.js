@@ -53,10 +53,10 @@ describe("GET /schools/:id", function(){
 
         expect(resp.statusCode).toEqual(200);
 
-        expect(resp.body).toEqual({
+        expect(resp.body).toEqual({school:{
             id: 101,
             name: "school A"
-        });
+        }});
     });
 
     test("unauth for, anon", async function(){
@@ -83,13 +83,21 @@ describe("GET /schools/:id/students", function(){
 
         expect(resp.statusCode).toEqual(200);
 
-        const students = response.body.students;
+        const students = resp.body.students;
         expect(students.length).toEqual(2);
         expect(students[0]).toEqual({
             "id": 1007,
             "first_name": 'Korella',
-            "laste_name": 'Glaister', 
-            "class_id": 1001
+            "last_name": 'Glaister', 
+            "class_id": 1001,
+            "school_id": 101,
+            "has_read": ['448461587'],
+            "book_id": 124,
+            "borrow_date": "2023-10-19",
+            "isbn": "448461587",
+            "last_name": "Glaister",
+            "school_id": 101,
+            "title": "Max Has a Fish"
         })
     });
 
@@ -111,6 +119,7 @@ describe("GET /schools/:id/students", function(){
 
 describe("GET /schools/:id/classes", function(){
     test("works", async function(){
+        console.log("TESTING ID/CLASSES")
         const resp = await request(app)
             .get("/schools/101/classes")
             .set("authorization", `Bearer ${u1Token}`);
@@ -118,7 +127,7 @@ describe("GET /schools/:id/classes", function(){
         expect(resp.statusCode).toEqual(200)
 
         const classes = resp.body.classes;
-        expect(classes.length).toEqual(2)
+        expect(classes.length).toEqual(3)
         expect(classes[0]).toEqual({
             "id": 1001,
             "name": "Class A",
@@ -256,7 +265,7 @@ describe("PATCH /schools/:id", function(){
 
         expect(resp.statusCode).toEqual(200);
         expect(resp.body).toEqual({
-            newSchool:
+            patchSchool:
                 {id: 101,
                 name: "test school"}
         });
@@ -302,7 +311,7 @@ describe("PATCH /schools/:id", function(){
             })
             .set("authorization", `Bearer ${masterToken}`);
 
-        expect(resp.statusCode).toEqual(401);
+        expect(resp.statusCode).toEqual(400);
     });
 
     test("not found for invalid id", async function(){
@@ -324,9 +333,9 @@ describe("DELETE /schools/:id", function(){
             .set("authorization", `Bearer ${masterToken}`);
 
         expect(resp.statusCode).toEqual(200);
-        expect(resp.body).toEqual({
+        expect(resp.body).toEqual({ deleteSchool:{
             id: 101
-        });
+        }});
     });
 
     test("unauth for school", async function(){

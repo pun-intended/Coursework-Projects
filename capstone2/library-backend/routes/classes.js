@@ -6,8 +6,10 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../expressError");
-const { ensureLoggedIn, ensureMaster, ensureAdmin } = require("../middleware/auth");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 const Class = require("../models/class");
+const createSchema = require("../schemas/classCreate.json")
+const patchSchema = require("../schemas/classPatch.json")
 
 const router = new express.Router();
 
@@ -23,6 +25,7 @@ router.get("/", ensureAdmin, async function(req, res, next){
         const classes = await Class.getAll();
         return res.json({ classes });
     } catch(e){
+        console.log(e)
         return next(e)
     }
 })
@@ -37,10 +40,14 @@ router.get("/", ensureAdmin, async function(req, res, next){
 router.post("/new", ensureAdmin, async function(req, res, next){
     try{
         const data = req.body;
+        const validator = jsonschema.validate(data, createSchema)
+        if(!validator.valid){
+            const errs = validator.errors.map(e => e.stack)
+            throw new BadRequestError(errs)
+        }
         const newClass = await Class.create(data.name, data.schoolId);
         return res.status(201).json({ newClass })
     } catch (e) {
-        console.log(e)
         return next(e)
     };
 });
@@ -70,8 +77,14 @@ router.get("/:id", ensureLoggedIn, async function (req, res, next) {
  */
 router.patch("/:id", ensureAdmin, async function (req, res, next) {
     try{
-        const updatedClass = await Class.patch(req.params.id, req.body.name);
-        return res.status(201).json({ updatedClass });
+        const data = req.body
+        const validator = jsonschema.validate(data, patchSchema)
+        if(!validator.valid){
+            const errs = validator.errors.map(e => e.stack)
+            throw new BadRequestError(errs)
+        }
+        const updatedClass = await Class.patch(req.params.id, data);
+        return res.status(200).json({ updatedClass });
     } catch (e) {
         return next(e);
     };

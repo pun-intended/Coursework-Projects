@@ -9,8 +9,8 @@ const { ensureAdmin, ensureCorrectUserOrAdmin, ensureLoggedIn } = require("../mi
 const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
 
-const userCreateSchema = require("../schemas/userCreate.json");
-const userUpdateSchema = require("../schemas/userUpdate.json");
+const createSchema = require("../schemas/userCreate.json");
+const patchSchema = require("../schemas/userUpdate.json");
 
 const router = new express.Router();
 
@@ -24,9 +24,8 @@ const router = new express.Router();
  */
 router.post("/create", ensureAdmin, async function (req, res, next) {
     try{
-        const validator = jsonschema.validate(req.body, userCreateSchema)
-        
-        if(req.body.role === "master" && (!res.locals.user.role === "master")){
+        const validator = jsonschema.validate(req.body, createSchema)
+        if(req.body.role === "master_admin" && !(res.locals.user.role === "master_admin")){
             throw new UnauthorizedError();
         }
         if(!validator.valid){
@@ -81,7 +80,7 @@ router.get("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
 // QUESTION - Best way to prevent someone from changing admins status while allowing admin change
 router.patch("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
     try{
-        const validator = jsonschema.validate(req.body, userUpdateSchema)
+        const validator = jsonschema.validate(req.body, patchSchema)
         if(!validator.valid){
             const errs = validator.errors.map(e => e.stack)
             throw new BadRequestError(errs)

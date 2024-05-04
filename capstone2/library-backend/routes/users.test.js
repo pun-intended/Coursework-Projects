@@ -21,10 +21,10 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-describe("POST /users/", function() {
+describe("POST /users/create", function() {
     test("works for admin", async function(){
         const resp = await request(app)
-            .post("/users")
+            .post("/users/create")
             .send({
                 id: 20001,
                 first_name: "test",
@@ -40,20 +40,22 @@ describe("POST /users/", function() {
                 id: 20001,
                 first_name: "test",
                 last_name: "last",
-                role: "user"
+                role: "user",
+                class_id: null,
+                school_id: null
             }
         });
     });
 
     test("Works for creating 'Master'", async function(){
         const resp = await request(app)
-            .post("/users")
+            .post("/users/create")
             .send({
                 id: 20001,
                 first_name: "test",
                 last_name: "last",
                 password: "pass",
-                role: "master"
+                role: "master_admin"
             })
         .set("authorization", `Bearer ${masterToken}`);
 
@@ -63,20 +65,23 @@ describe("POST /users/", function() {
                 id: 20001,
                 first_name: "test",
                 last_name: "last",
-                role: "master"
+                role: "master_admin",
+                class_id: null,
+                school_id: null
             }
         });
     });
 
     test("unauth for creating 'master' without 'master' permissions", async function() {
+        console.log(`------- TESTING HERE -------`)
         const resp = await request(app)
-            .post("/users")
+            .post("/users/create")
             .send({
                 id: 20001,
                 first_name: "test",
                 last_name: "last",
                 password: "pass",
-                role: "master"
+                role: "master_admin"
             })
             .set("authorization", `Bearer ${adminToken}`);
 
@@ -85,7 +90,7 @@ describe("POST /users/", function() {
 
     test("unauth for users", async function(){
         const resp = await request(app)
-            .post("/users")
+            .post("/users/create")
             .send({
                 id: 20001,
                 first_name: "test",
@@ -100,7 +105,7 @@ describe("POST /users/", function() {
 
     test("unauth for anon", async function(){
         const resp = await request(app)
-            .post("/users")
+            .post("/users/create")
             .send({
                 id: 20001,
                 first_name: "test",
@@ -114,7 +119,7 @@ describe("POST /users/", function() {
 
     test("bad request with missing fields", async function(){
         const resp = await request(app)
-            .post("/users")
+            .post("/users/create")
             .send({
                 first_name: "test",
                 last_name: "last",
@@ -128,7 +133,7 @@ describe("POST /users/", function() {
 
     test("bad request with invalid data", async function(){
         const resp = await request(app)
-            .post("/users")
+            .post("/users/create")
             .send({
                 id: "string",
                 first_name: "test",
@@ -142,31 +147,32 @@ describe("POST /users/", function() {
     });
 });
 
-describe("GET /users/", function() {
-    test("works for users", async function(){
+describe("GET /users", function() {
+    test("works for admin", async function(){
+        const resp = await request(app)
+            .get("/users")
+            .set("authorization", `Bearer ${adminToken}`);
+
+        const users  = resp.body.users
+        expect(users.length).toEqual(3)
+        expect(users[0]).toEqual({
+                id: 10001,
+                first_name:'user', 
+                last_name: 'name', 
+                role: "user",
+                class_id: null,
+                school_id: null
+            });
+    });
+
+    test("unauth for users", async function(){
         const resp = await request(app)
             .get("/users")
             .set("authorization", `Bearer ${u1Token}`);
 
-        expect(resp.body).toEqual({
-            users: [
-                {id: 10001,
-                first_name:'test', 
-                last_name: 'user', 
-                role: "user"},
-                
-                {id: 10002, 
-                first_name: 'test', 
-                last_name: 'user2',
-                role: "user"},
-                
-                {id: 10003, 
-                first_name: 'admin', 
-                last_name: 'user',
-                role: "school_admin"}]
-            });
+        expect(resp.statusCode).toEqual(401);
     });
-
+    
     test("unauth for anon", async function(){
         const resp = await request(app)
             .get("/users");
@@ -184,9 +190,11 @@ describe("GET /users/:id", function() {
         expect(resp.body).toEqual({
             user: {
                 id: 10001,
-                first_name:'test', 
-                last_name: 'user', 
-                is_admin: false
+                first_name:'user', 
+                last_name: 'name', 
+                role: 'user',
+                class_id: null,
+                school_id: null
             }});
     });
 
@@ -197,10 +205,12 @@ describe("GET /users/:id", function() {
 
         expect(resp.body).toEqual({
                 user: {
-                id: 10001,
-                first_name:'test', 
-                last_name: 'user', 
-                is_admin: false
+                    id: 10001,
+                    first_name:'user', 
+                    last_name: 'name', 
+                    role: 'user',
+                    class_id: null,
+                    school_id: null
             }});
     });
 
@@ -235,7 +245,9 @@ describe("PATCH /users/:id", function() {
             .send({
                 first_name: "newName",
                 last_name: "newLast",
-                password: "newPass"
+                password: "newPass",
+                class_id: 1001,
+                school_id: 101
             })
             .set("authorization", `Bearer ${adminToken}`);
 
@@ -244,7 +256,9 @@ describe("PATCH /users/:id", function() {
                 id: 10001,
                 first_name: "newName",
                 last_name: "newLast",
-                is_admin: false
+                role: "user",
+                class_id: 1001,
+                school_id: 101
             }
         });
     });
@@ -255,16 +269,20 @@ describe("PATCH /users/:id", function() {
             .send({
                 first_name: "newName",
                 last_name: "newLast",
-                password: "newPass"
+                password: "newPass",
+                class_id: 1001,
+                school_id: 101
             })
             .set("authorization", `Bearer ${u1Token}`);
 
         expect(resp.body).toEqual({
             updated: {
-                id: 10001,
                 first_name: "newName",
                 last_name: "newLast",
-                is_admin: false
+                class_id: 1001,
+                school_id: 101,
+                role: "user",
+                id: 10001
             }
         });
     });
@@ -318,15 +336,15 @@ describe("DELETE /users/:id", function() {
         expect(resp.body).toEqual({deleted: {id:10001}});
     });
 
-    test("works for same user", async function(){
+    test("unauth for same user", async function(){
         const resp = await request(app)
             .delete("/users/10001")
             .set("authorization", `Bearer ${u1Token}`);
 
-        expect(resp.body).toEqual({deleted: {id:10001}});
+            expect(resp.statusCode).toEqual(401);
     });
 
-    test("unauth for other users", async function(){
+    test("unauth for users", async function(){
         const resp = await request(app)
             .delete("/users/10001")
             .set("authorization", `Bearer ${u2Token}`);

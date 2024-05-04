@@ -7,9 +7,12 @@ const express = require("express");
 
 const { BadRequestError } = require("../expressError");
 const { ensureMaster, ensureAdmin, ensureLoggedIn } = require("../middleware/auth");
-const Class = require("../models/school");
+const Class = require("../models/class");
 const School = require("../models/school");
 const BookSet = require("../models/bookSet");
+const Student = require("../models/student");
+const createSchema = require("../schemas/schoolCreate.json")
+const patchSchema = require("../schemas/schoolPatch.json")
 
 const router = new express.Router();
 
@@ -97,6 +100,12 @@ router.get("/:id/books", ensureLoggedIn, async function (req, res, next) {
  */
 router.post("/new", ensureMaster, async function (req, res, next){
     try{
+        const data = req.body;
+        const validator = jsonschema.validate(data, createSchema)
+        if(!validator.valid){
+            const errs = validator.errors.map(e => e.stack)
+            throw new BadRequestError(errs)
+        }
         const newSchool = await School.create(req.body.name);
         return res.status(201).json({newSchool});
     } catch(e) {
@@ -112,9 +121,16 @@ router.post("/new", ensureMaster, async function (req, res, next){
  */
 router.patch("/:id", ensureMaster, async function (req, res, next){
     try{
+        const data = req.body;
+        const validator = jsonschema.validate(data, patchSchema)
+        if(!validator.valid){
+            const errs = validator.errors.map(e => e.stack)
+            throw new BadRequestError(errs)
+        }
         const patchSchool = await School.patch(req.params.id, req.body.name);
         return res.json({patchSchool});
     } catch(e) {
+        console.log(e)
         return next(e);
     }
 })
@@ -130,6 +146,7 @@ router.delete("/:id", ensureMaster, async function (req, res, next){
         const deleteSchool = await School.remove(req.params.id);
         return res.json({deleteSchool});
     } catch(e) {
+        console.log(e)
         return next(e);
     }
 })

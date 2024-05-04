@@ -172,10 +172,10 @@ describe("PATCH /classes/:id", function(){
         
         expect(resp.statusCode).toEqual(200);
         
-        expect(resp.body).toEqual({
-            id: 1001,
+        expect(resp.body).toEqual({ updatedClass: 
+            {id: 1001,
             name: "test class",
-            school_id: 101
+            school_id: 101}
         });
     });
 

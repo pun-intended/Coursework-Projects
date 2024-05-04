@@ -40,6 +40,7 @@ router.get("/", ensureAdmin, async function (req, res, next) {
         const students = await Student.getAllStudents();
         return res.json({students});
     }catch(e){
+        console.log(e)
         return next(e);
     }
 })

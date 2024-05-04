@@ -51,13 +51,13 @@ router.get("/outstanding", ensureLoggedIn, async function (req, res, next) {
  */
 router.post("/checkout", ensureLoggedIn, async function (req, res, next) {
     try{
-        const validator = jsonschema.validate(req.body, checkOutSchema)
+        const data = req.body
+        const validator = jsonschema.validate(data, checkOutSchema)
         if(!validator.valid){
             const errs = validator.errors.map(e => e.stack)
             throw new BadRequestError(errs)
         }
-        const data = req.body
-        const borrowed = await Book.checkOut(req.body);
+        const borrowed = await Book.checkOut(data);
         return res.status(201).json({ borrowed });
     } catch (e) {
         return next(e);
