@@ -25,7 +25,7 @@ class Class {
 
     // get all classes
     static async getAll(school_id = null){
-        const queryString = 
+        let queryString = 
             `SELECT id, name, school_id
             FROM classes`
         let allClasses;
@@ -36,7 +36,7 @@ class Class {
         } else {
             allClasses = await db.query(queryString)
         }
-        
+        if (!allClasses.rows[0]) throw new NotFoundError(`No classes found for school id ${school_id}`);
         
         return allClasses.rows;
     }
@@ -98,8 +98,9 @@ class Class {
         
         const patchedClass = await db.query(querySql, [...values, classId]);
 
-        if (!patchedClass.rows) throw new NotFoundError(`No class found with class id ${classId}`);
+        if (!patchedClass.rows[0]) throw new NotFoundError(`No class found with class id ${classId}`);
 
+        console.log(`rows --> ${patchedClass.rows}`)
         return patchedClass.rows[0];
     }
 }

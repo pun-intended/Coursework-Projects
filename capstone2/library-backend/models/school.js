@@ -25,6 +25,7 @@ class School {
             WHERE id = $1`,
             [id]
         );
+        if(!school.rows[0]) throw new NotFoundError(`No school found with ID ${id}`)
         return school.rows[0];
     }
     // Add school
@@ -32,7 +33,7 @@ class School {
         const newSchool = await db.query(
             `INSERT INTO schools (name)
             VALUES($1)
-            RETURNING id`,
+            RETURNING id, name`,
             [name]
         );
 
@@ -49,7 +50,7 @@ class School {
             [name, schoolId]
         );
 
-        if(!updateSchool.rows[0]) throw NotFoundError(`No school found with ID ${updateSchool}`);
+        if(!updateSchool.rows[0]) throw new NotFoundError(`No school found with ID ${schoolId}`);
         
         return updateSchool.rows[0];
     }
@@ -63,7 +64,7 @@ class School {
             [schoolId]
         );
 
-        if(!deletedSchool.rows[0]) throw NotFoundError(`No school found with ID ${schoolId}`)
+        if(!deletedSchool.rows[0]) throw new NotFoundError(`No school found with ID ${schoolId}`)
 
         return deletedSchool.rows[0];
     }

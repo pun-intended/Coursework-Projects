@@ -32,9 +32,11 @@ class Student {
      * Returns {students: [{id, first_name, last_name, level, has_read, book_id, title, isbn, borrow_date}, ...]}
      *  borrowing id
      */
-    static async getAllStudents(){
+    static async getAllStudents(schoolId = null){
 
-        const students = await db.query(`
+        let students;
+
+        let baseQuery = `
         SELECT  S.id,
                 S.first_name,
                 S.last_name,
@@ -63,9 +65,19 @@ class Student {
             JOIN master_books M ON M.isbn = B.isbn
             JOIN borrow_record AS rec ON B.id = rec.book_id
             WHERE return_date IS NULL) AS q2 
-        ON s.id = q2.student_id
-        ORDER BY S.id`)
-        
+        ON s.id = q2.student_id`
+
+        if(schoolId){
+            baseQuery += ` WHERE schools.id = $1 ORDER BY S.id`;
+            students = await db.query(baseQuery, [schoolId])
+        } else{
+            baseQuery += ` ORDER BY S.id`
+            students = await db.query(baseQuery)
+        }
+        if (!students.rows[0]) {
+            throw new NotFoundError(`No student found with school ID ${schoolId}`);
+        }
+
         return students.rows;
     }
 
@@ -96,7 +108,21 @@ class Student {
      * 
      * {Studentid, schoolId} => [{isbn, title, stage, available}, ...]
      */
-    static async getUnreadBooks(studentId, schoolId){
+    static async getUnreadBooks(studentId){
+        
+        const student = await db.query(
+            `SELECT C.school_id
+            FROM students S
+            JOIN classes C ON S.class_id = C.id
+            WHERE S.id = $1`,
+            [studentId]
+        );
+        console.log(student)
+
+        if (!student.rows[0]) {
+            throw new NotFoundError(`No student found with id ${studentId}`);
+        }
+
         const unread = await db.query(
             `SELECT isbn, 
                     title, 
@@ -111,8 +137,12 @@ class Student {
                     FROM borrow_record
                     JOIN books ON books.id = borrow_record.book_id
                     WHERE student_id = $2)`,
-            [schoolId, studentId]
+            [student.school_id, studentId]
         );
+
+        if (!unread.rows[0]) {
+            throw new NotFoundError(`No unread books for student with id ${studentId}`);
+        }
         return unread.rows;
     }
 

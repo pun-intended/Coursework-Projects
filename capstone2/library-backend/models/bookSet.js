@@ -11,6 +11,7 @@ class BookSet {
      * 
      */
     static async getAll(schoolId = null){
+        let sets
         let queryString = 
             `SELECT B.isbn, B.set_id, M.title, M.stage
             FROM books B
@@ -19,9 +20,12 @@ class BookSet {
         
         if(schoolId){
             queryString += ` WHERE sets.school_id = $1`
-        }
+            sets = await db.query(queryString, [schoolId]);
+        } else {
+            sets = await db.query(queryString);
+        };
 
-        const sets = await db.query(queryString, [schoolId])
+        if (!sets.rows[0]) throw new NotFoundError(`No books found with school id ${schoolId}`);
 
         return sets.rows
     }
@@ -40,26 +44,23 @@ class BookSet {
 
         const setId = newSet.rows[0].set_id;
         
+        let newBookSet;
+
+        let stringQuery = `INSERT INTO books (isbn, set_id) 
+        SELECT isbn, set_id FROM master_books                                       
+        CROSS JOIN (SELECT set_id FROM book_sets WHERE set_id = $1) AS sets`
+
         if(!stage){
-        const newBookSet = await db.query(
-            `INSERT INTO books (isbn, set_id) 
-            SELECT isbn, set_id FROM master_books                                       
-            CROSS JOIN (SELECT set_id FROM book_sets WHERE set_id = $1) AS sets
-            RETURNING set_id
-            `,
-            [setId]
-            );
+            const fullQuery = stringQuery + ` RETURNING set_id`
+            newBookSet = await db.query(fullQuery,[setId]);
+        } else{
+            const fullQuery = stringQuery + `
+                WHERE stage = $2 
+                RETURNING set_id`
+            newBookSet = await db.query(fullQuery,[setId, stage]);
         }
 
-        const newBookSet = await db.query(
-            `INSERT INTO books (isbn, set_id) 
-            SELECT isbn, set_id FROM master_books                                       
-            CROSS JOIN (SELECT set_id FROM book_sets WHERE set_id = $1) AS sets
-            WHERE stage = $2
-            RETURNING set_id
-            `,
-            [setId, stage]
-            );
+        
 
         return newBookSet.rows[0]
     }
