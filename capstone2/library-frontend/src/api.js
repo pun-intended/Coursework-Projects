@@ -40,7 +40,7 @@ class LibraryApi {
           throw Array.isArray(message) ? message : [message];
         }
       }
-
+    // ----- Auth -----
     // Register new user
     static async register(data){
         let res = await this.request('auth/register', data, "post");
@@ -51,7 +51,8 @@ class LibraryApi {
         let res = await this.request('auth/token', data, "post");
         return res.token
     }
-    // /books
+
+    // ----- Books -----
     // ** Get all books*/
     static async getAllBooks(){
         let res = await this.request('books');
@@ -82,8 +83,13 @@ class LibraryApi {
         return res.book
     }
 
-    // /students
+    // ----- Classes -----
 
+    // ----- Schools -----
+
+    // ----- Sets -----
+
+    // ----- Students -----
     /** Get all students */
     static async getAllStudents(){
         let res = await this.request('students');
@@ -102,11 +108,10 @@ class LibraryApi {
         return res.unread
     }
 
-    // users
-
+    // ----- Users -----
     /** create new user - admin only*/
     static async createUser(data){
-        let res = await this.request('users', data, "post");
+        let res = await this.request('users/create', data, "post");
         return res
     }
 
