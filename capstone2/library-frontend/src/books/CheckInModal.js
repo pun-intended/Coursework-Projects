@@ -23,7 +23,7 @@ const CheckInModal = ({modal, toggle, book_id, setUpdate}) => {
     const INITIAL_STATE = {
         'date': new Date().toISOString().slice(0, 10),
         'book_id': book_id.toString(),
-        'condition': book.condition || "good"
+        'condition': book.condition || "Great"
     };
 
     const students = useContext(StudentContext);
