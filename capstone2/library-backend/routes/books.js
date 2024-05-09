@@ -92,8 +92,7 @@ router.post("/checkin", ensureLoggedIn, async function (req, res, next) {
  */
 router.get("/:id", ensureLoggedIn, async function (req, res, next) {
     try {
-        // TODO - validate schema
-        const book = await Book.getBook(req.params.id);
+        const book = await Book.getBook(req.params.id, req.query.schoolId);
         return res.json({ book });
     } catch (e) {
         return next(e);
@@ -109,7 +108,6 @@ router.get("/:id", ensureLoggedIn, async function (req, res, next) {
  */
 router.get("/:id", ensureLoggedIn, async function (req, res, next) {
     try {
-        // TODO - validate schema
         const book = await Book.getHasNotRead(req.params.id);
         return res.json({ book });
     } catch (e) {
