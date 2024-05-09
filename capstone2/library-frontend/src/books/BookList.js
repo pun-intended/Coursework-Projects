@@ -8,15 +8,17 @@ import LibraryApi from "../api";
 import {Container, Col, CardGroup} from 'reactstrap'
 import StudentContext from "../StudentContext";
 import "./BookList.css"
+import UserContext from "../UserContext";
 
 // TODO - Move books/update out, pass books as param to make {outstanding} {all books} {available} list
 const BookList = () => {
     const {setStudents} = useContext(StudentContext)
+    const {currentUser} = useContext(UserContext)
     const [books, setBooks] = useState([])
     const [update, setUpdate] = useState(false)
     useEffect( () => {
         async function initializeList(){
-            const updateBooks = await LibraryApi.getAllBooks()
+            const updateBooks = await LibraryApi.getAllBooks(currentUser.school_id)
             const updateStudents = await LibraryApi.getAllStudents()
             setBooks(updateBooks)
             setStudents(updateStudents)
@@ -32,7 +34,7 @@ const BookList = () => {
                     {books.map((book) => {
                         return(
                         <Col className="BookCard" xs="2">
-                            <BookCard book={book} setUpdate={setUpdate} key={book.id}/>
+                            <BookCard book={book} setUpdate={setUpdate} key={book.isbn}/>
                         </Col>
                         )
                     })}
