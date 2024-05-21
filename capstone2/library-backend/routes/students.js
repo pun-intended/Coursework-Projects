@@ -28,9 +28,9 @@ router.post("/", ensureAdmin, async function (req, res, next) {
     }
 })
 
-/** GET / => {students: [{id, first_name, last_name, level}]}
+/** GET / => {students: [{id, first_name, last_name, class_id}]}
  * 
- * Returns {id, first_name, last_name, level} for all students
+ * Returns {id, first_name, last_name, class_id} for all students
  * 
  * Auth: schoolAdmin
  */
@@ -43,7 +43,7 @@ router.get("/", ensureAdmin, async function (req, res, next) {
         console.log(e)
         return next(e);
     }
-})
+}) 
 
 
 /** GET /[id] => {id, first_name, last_name, level}

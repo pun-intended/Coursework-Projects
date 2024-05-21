@@ -8,6 +8,7 @@ const express = require("express");
 const { BadRequestError } = require("../expressError");
 const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 const Class = require("../models/class");
+const Student = require("../models/student")
 const createSchema = require("../schemas/classCreate.json")
 const patchSchema = require("../schemas/classPatch.json")
 
@@ -62,6 +63,23 @@ router.post("/new", ensureAdmin, async function(req, res, next){
 router.get("/:id", ensureLoggedIn, async function (req, res, next) {
     try{
         const classInfo = await Class.get(req.params.id);
+        return res.json({ classInfo });
+    } catch(e) {
+        return next(e)
+    }
+})
+
+/** GET /id/students => {students...}
+ * 
+ * Get a list of all students in that class
+ * Student data includes
+ * 
+ * Auth: Login
+ */
+
+router.get("/:id/students", ensureLoggedIn, async function (req, res, next) {
+    try{
+        const classInfo = await Student.getAllStudents(null, req.params.id);
         return res.json({ classInfo });
     } catch(e) {
         return next(e)

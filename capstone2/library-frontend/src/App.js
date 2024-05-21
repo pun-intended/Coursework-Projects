@@ -55,15 +55,6 @@ function App() {
     setCurrentUser("")
   }
 
-  async function signup(data) {
-    const newToken = await LibraryApi.register(data)
-    setToken(newToken)
-  }
-  async function patchUser(data){
-    const newUser = LibraryApi.patchUser(data);
-    setCurrentUser(newUser);
-  }
-
   useEffect(() => {
     async function updateUser() {
       if(token.length > 0){
@@ -83,8 +74,16 @@ function App() {
     async function populateStudents() {
       if(token.length > 0){
         try{
-          const Ss = await LibraryApi.getAllStudents()
-          setStudents(Ss)
+          let role = currentUser.role;
+            let allStudents
+            if(role === "master_admin"){
+                allStudents = await LibraryApi.getAllStudents()
+            } else if(role === "school_admin"){
+                allStudents = await LibraryApi.getStudentsBySchool(currentUser.school_id);
+            } else if(role === "user"){
+                allStudents = await LibraryApi.getStudentsByClass(null, currentUser.class_id)
+            }
+          setStudents(allStudents)
         }catch(e){
           console.log(`Error Loading Students: ${e}`)
         }
@@ -110,7 +109,7 @@ function App() {
           }
           </Container>
           {/* <RouteList login={login} signup={signup} patchUser={patchUser} setToken={setToken} setCurrentUser={setCurrentUser}/> */}
-          <RouteList login={login} logout={logout}/>
+          <RouteList login={login} logout={logout} setToken={setToken}/>
 
         </BrowserRouter>
         </AlertContext.Provider>

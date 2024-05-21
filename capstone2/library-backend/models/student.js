@@ -32,7 +32,7 @@ class Student {
      * Returns {students: [{id, first_name, last_name, level, has_read, book_id, title, isbn, borrow_date}, ...]}
      *  borrowing id
      */
-    static async getAllStudents(schoolId = null){
+    static async getAllStudents(schoolId = null, classId = null){
 
         let students;
 
@@ -67,10 +67,13 @@ class Student {
             WHERE return_date IS NULL) AS q2 
         ON s.id = q2.student_id`
 
-        if(schoolId){
+        if(schoolId) {
             baseQuery += ` WHERE schools.id = $1 ORDER BY S.id`;
             students = await db.query(baseQuery, [schoolId])
-        } else{
+        } else if(classId) {
+            baseQuery += ` WHERE classes.id = $1 ORDER BY S.id`;
+            students = await db.query(baseQuery, [classId])
+        } else {
             baseQuery += ` ORDER BY S.id`
             students = await db.query(baseQuery)
         }
@@ -84,7 +87,7 @@ class Student {
     /**
      * Return details on Student
      * 
-     * {id} => {id, first_name, last_name, level}
+     * {id} => {id, first_name, last_name, class_id}
      * 
      * throws NotFoundError if student ID doesn't exist
      */

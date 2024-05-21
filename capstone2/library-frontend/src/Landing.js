@@ -1,27 +1,27 @@
 import React, { useEffect, useState, useContext } from "react"
 import { Button } from "reactstrap"
-import LibraryApi from "./api"
-import AlertContext from "./AlertContext"
 
-function Landing () {
+const Landing = ({setToken}) => {
 
-    // const {alerts, setAlerts, addAlert, removeAlert} = useContext(AlertContext)
-    // function handleClick(evt){
-    //     console.log("New Alert")
-    //     const target = evt.target
-    //     addAlert("test alert", target.value)
-    // }
+    function handleClick(evt){
+        console.log("token chosen")
+        const target = evt.target
+
+        setToken(target.value)
+    }
 
     return (
         <div>
             <h2>Welcome to The Library!</h2>
-            {/* <Button color="primary" value="primary" onClick={handleClick}>Add Primary Alert</Button>
-            <Button color="success" value="success" onClick={handleClick}>Add success Alert</Button>
-            <Button color="danger" value="danger" onClick={handleClick}>Add danger Alert</Button> */}
+            <Button color="primary" value={user} onClick={handleClick}>User</Button>
+            <Button color="success" value={school_admin} onClick={handleClick}>School Admin</Button>
+            <Button color="danger" value={master_admin} onClick={handleClick}>Master</Button>
         </div>
     )
 }
 
-export default Landing
+let user = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAwMDEsInJvbGUiOiJ1c2VyIn0.oRPWvziiTq-viEm_-oNoW1kcaQFh8QSnnFYMQcu_smk`
+let school_admin = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAwMDIsInJvbGUiOiJzY2hvb2xfYWRtaW4ifQ._JbuOzi8zEggsCFHnPQSptM8VKzm_-OPlzBA5FY0o4w`
+let master_admin = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAwMDMsInJvbGUiOiJtYXN0ZXJfYWRtaW4ifQ.s-_rwrwLNiKGXlDCLdqDR4g_CLiomu9Iv7bR1b-f77s`
 
-// TODO - Add links to Books, students
+export default Landing

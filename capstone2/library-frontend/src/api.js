@@ -84,16 +84,40 @@ class LibraryApi {
     }
 
     // ----- Classes -----
+    /** Get a class */
+    static async getClass(id){}
 
     // ----- Schools -----
+    /** Get a school */
+    static async getSchool(id){}
 
     // ----- Sets -----
+    /** Get a set of books */
+    static async getSet(id){}
+
+    /** Update a set of books */
+    static async updateSet(data){}
+
+    /** Delete a set of books */
+    static async deleteSet(){}
 
     // ----- Students -----
     /** Get all students */
     static async getAllStudents(){
         let res = await this.request('students');
-        return res.students
+        return res.students;
+    }
+
+    /** Get all students in a given class */
+    static async getStudentsByClass(class_id){
+        let res = await this.request(`classes/${class_id}/students`);
+
+    }
+
+    /** GEt all students in a given school */
+    static async getStudentsBySchool(school_id){
+        let res = await this.request(`schools/${school_id}/students`)
+        return res.students;
     }
 
     /** Get student by ID */

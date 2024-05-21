@@ -56,7 +56,7 @@ router.get("/", ensureAdmin, async function (req, res, next) {
 
 /** GET /[id] => {user}
  * 
- * user is {id, first_name, last_name, role}
+ * user is {id, first_name, last_name, role, class_id, school_id}
  * 
  * Auth: Admin, or same user
  */

@@ -6,7 +6,7 @@ import StudentList from "./students/StudentList"
 import BookList from "./books/BookList"
 import Landing from './Landing';
 
-function RouteList({login, logout}) {
+function RouteList({login, logout, setToken}) {
 
     return(
         <Routes>
@@ -14,7 +14,7 @@ function RouteList({login, logout}) {
             <Route path="/logout" element={<LogOut logout={logout}/>} />
             <Route path="/students" element={<StudentList />} />
             <Route path="/books" element={<BookList />} />
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<Landing setToken={setToken}/>} />
         </Routes>
     )
 
