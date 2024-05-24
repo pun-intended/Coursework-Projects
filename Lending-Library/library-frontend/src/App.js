@@ -16,6 +16,7 @@ import DismissableAlert from './DismissableAlert.js';
 function App() {
   const [token, setToken] = useLocalStorage('token', '')
   const [currentUser, setCurrentUser] = useLocalStorage('currentUser', '')
+  const [location, setLocation] = useLocalStorage('location', '')
   const [students, setStudents] = useState([])
   const [alerts, setAlerts] = useState([])
 
@@ -57,6 +58,7 @@ function App() {
 
   useEffect(() => {
     async function updateUser() {
+      console.log("updating user")
       if(token.length > 0){
         try{
           const decodedToken = jwtDecode(token)
@@ -92,9 +94,21 @@ function App() {
     populateStudents()
   },[token])
 
+  useEffect(() => {
+    async function getLocation(){
+      if (currentUser.role === "master_admin"){
+        setLocation({"school": "Head Office"})
+      } else {
+        let schoolClass = LibraryApi.getClass(currentUser.class_id)
+        setLocation(schoolClass)
+      }
+    }
+    getLocation();
+  }, [currentUser])
+
   return (
     <div className="App">
-      <UserContext.Provider value={currentUser}>
+      <UserContext.Provider value={currentUser }>
         <StudentContext.Provider value={{students, setStudents}}>
           <AlertContext.Provider value={{alerts, setAlerts, addAlert, removeAlert}}>
         <BrowserRouter>

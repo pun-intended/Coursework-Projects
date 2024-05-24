@@ -79,8 +79,8 @@ router.get("/:id", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/:id/students", ensureLoggedIn, async function (req, res, next) {
     try{
-        const classInfo = await Student.getAllStudents(null, req.params.id);
-        return res.json({ classInfo });
+        const students = await Student.getAllStudents(null, req.params.id);
+        return res.json({ students });
     } catch(e) {
         return next(e)
     }

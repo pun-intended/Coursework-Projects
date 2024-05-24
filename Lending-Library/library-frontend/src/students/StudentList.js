@@ -12,7 +12,7 @@ import UserContext from "../UserContext";
 const StudentList = () => {
     const [update, setUpdate] = useState(false)
     const {students, setStudents} = useContext(StudentContext)
-    const {currentUser} = useContext(UserContext)
+    const currentUser = useContext(UserContext)
     
     useEffect( () => {
         async function initializeList(){
@@ -24,7 +24,8 @@ const StudentList = () => {
             } else if(role === "school_admin"){
                 allStudents = await LibraryApi.getStudentsBySchool(currentUser.school_id);
             } else if(role === "user"){
-                allStudents = await LibraryApi.getStudentsByClass(null, currentUser.class_id)
+                console.log(currentUser.class_id)
+                allStudents = await LibraryApi.getStudentsByClass(currentUser.class_id)
             }
             setStudents(allStudents)
             setUpdate(false)

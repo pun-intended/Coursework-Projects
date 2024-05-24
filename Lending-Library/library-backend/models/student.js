@@ -71,7 +71,7 @@ class Student {
             baseQuery += ` WHERE schools.id = $1 ORDER BY S.id`;
             students = await db.query(baseQuery, [schoolId])
         } else if(classId) {
-            baseQuery += ` WHERE classes.id = $1 ORDER BY S.id`;
+            baseQuery += ` WHERE C.id = $1 ORDER BY S.id`;
             students = await db.query(baseQuery, [classId])
         } else {
             baseQuery += ` ORDER BY S.id`

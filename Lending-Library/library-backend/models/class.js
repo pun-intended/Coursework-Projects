@@ -12,8 +12,9 @@ class Class {
     // Get Class
     static async get(id){
         const classInfo = await db.query(
-            `SELECT id, name, school_id
-            FROM classes
+            `SELECT C.id, C.name, C.school_id, S.name
+            FROM classes C
+            JOIN schools S on C.school_id = S.id
             WHERE id = $1`,
             [id]
         );
@@ -26,8 +27,9 @@ class Class {
     // get all classes
     static async getAll(school_id = null){
         let queryString = 
-            `SELECT id, name, school_id
-            FROM classes`
+            `SELECT C.id, C.name, C.school_id, S.name
+            FROM classes C
+            JOIN schools S on C.school_id = S.id`
         let allClasses;
 
         if(school_id){

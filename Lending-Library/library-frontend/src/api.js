@@ -111,6 +111,7 @@ class LibraryApi {
     /** Get all students in a given class */
     static async getStudentsByClass(class_id){
         let res = await this.request(`classes/${class_id}/students`);
+        return res.students;
 
     }
 
